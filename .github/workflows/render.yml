@@ -55,6 +55,19 @@ jobs:
           IDLE: ${{ github.event.inputs.idle_name }}
           FPS: ${{ github.event.inputs.fps }}
         run: node render_mp4.js
+      - name: Generate thumbnail (frame pertama, crop presisi)
+        working-directory: spine_renderer
+        env:
+          MODE: thumbnail
+          ASSET: ${{ steps.asset.outputs.path }}
+          THUMBNAIL_OUT: ${{ github.workspace }}/spine_renderer/output/thumbnail.png
+          ACTION: ${{ github.event.inputs.action_name }}
+          IDLE: ${{ github.event.inputs.idle_name }}
+        run: node render_mp4.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: character-thumbnail
+          path: spine_renderer/output/thumbnail.png
       - name: Baca total_frames dari bounds.json
         id: read_bounds
         run: echo "total_frames=$(node -pe 'JSON.parse(require("fs").readFileSync("spine_renderer/output/bounds.json")).totalFrames')" >> "$GITHUB_OUTPUT"

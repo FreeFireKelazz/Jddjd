@@ -85,6 +85,7 @@ const BOUNDS_FILE = process.env.BOUNDS_FILE || path.join(ROOT, "bounds.json");
 const FRAME_START = Number(process.env.FRAME_START || 0);
 const FRAME_END = Number(process.env.FRAME_END || 0);
 const FRAMES_OUT = process.env.FRAMES_OUT || path.join(ROOT, "frames");
+const THUMBNAIL_OUT = process.env.THUMBNAIL_OUT || path.join(ROOT, `${SPINE_FILES.baseName}_thumbnail.png`);
 
 function readFile(file) {
     return fs.readFileSync(file);
@@ -188,17 +189,23 @@ function newUnion() {
 
 function makeSequence(skeletonData) {
     const action = skeletonData.findAnimation(ACTION_NAME);
-    const idle = skeletonData.findAnimation(IDLE_NAME);
-
     if (!action) throw new Error(`Animation "${ACTION_NAME}" tidak ditemukan.`);
-    if (!idle) throw new Error(`Animation "${IDLE_NAME}" tidak ditemukan.`);
+
+    const idle = skeletonData.findAnimation(IDLE_NAME);
+    const hasIdle = !!idle;
+
+    if (!hasIdle) {
+        console.log(`Catatan: animation "${IDLE_NAME}" tidak ditemukan di file ini.`);
+        console.log(`         Video akan berisi "${ACTION_NAME}" saja (bagian idle dilewati).`);
+    }
 
     return {
         action,
-        idle,
+        idle: hasIdle ? idle : null,
+        hasIdle,
         actionDuration: action.duration,
-        idleDuration: idle.duration,
-        totalDuration: action.duration + idle.duration
+        idleDuration: hasIdle ? idle.duration : 0,
+        totalDuration: action.duration + (hasIdle ? idle.duration : 0)
     };
 }
 
@@ -218,7 +225,12 @@ function createSequenceSimulator(skeletonData, sequence) {
     function switchToIdle() {
         if (idleStarted) return;
         idleStarted = true;
-        drawable.animationState.setAnimation(0, IDLE_NAME, false);
+        if (sequence.hasIdle) {
+            drawable.animationState.setAnimation(0, IDLE_NAME, false);
+        }
+        // Kalau tidak ada animasi idle, biarkan pose terakhir dari action
+        // tetap dipakai (idleDuration = 0 jadi bagian ini nyaris tidak pernah
+        // benar-benar dipakai untuk merender frame tambahan).
     }
 
     function advanceTo(targetTime) {
@@ -601,11 +613,98 @@ async function runSingleMode() {
     console.log("========================================");
 }
 
+// --------------------------------------------------------
+// MODE=thumbnail: ambil 1 frame pertama (t=0) dari animasi
+// "idle" kalau ada, kalau tidak ada pakai animasi "action".
+// Hasil di-crop presis ke bounding box pixel karakter (tidak
+// ada pixel yang kepotong ATAU sisa ruang kosong berlebih),
+// disimpan sebagai PNG transparan.
+// --------------------------------------------------------
+async function runThumbnailMode() {
+    const ck = await CanvasKitInit();
+    const atlas = await loadTextureAtlas(ck, ATLAS, readFile);
+    const skeletonData = await loadSkeletonData(JSON_FILE, atlas, readFile);
+    const renderer = new SkeletonRenderer(ck);
+
+    const idleAnim = skeletonData.findAnimation(IDLE_NAME);
+    const actionAnim = skeletonData.findAnimation(ACTION_NAME);
+
+    let animName;
+    if (idleAnim) {
+        animName = IDLE_NAME;
+    } else if (actionAnim) {
+        animName = ACTION_NAME;
+        console.log(`Animation "${IDLE_NAME}" tidak ada, thumbnail pakai frame pertama "${ACTION_NAME}".`);
+    } else {
+        const list = skeletonData.animations || [];
+        if (list.length === 0) throw new Error("Tidak ada animasi sama sekali di file ini.");
+        animName = list[0].name;
+        console.log(`Animation "${IDLE_NAME}" & "${ACTION_NAME}" tidak ada, thumbnail pakai animasi "${animName}".`);
+    }
+
+    console.log(`Thumbnail dari animasi: ${animName} (frame pertama, t=0)`);
+
+    const drawable = createDrawable(skeletonData);
+    resetAndStart(drawable, animName, false); // setToSetupPose + apply t=0
+
+    // Bounds kasar (world space) untuk frame ini saja.
+    const worldBounds = getBounds(drawable.skeleton);
+    const safe = makeSafeCanvasSize(worldBounds);
+
+    // Scan piksel presisi (downscale dulu biar cepat, sama seperti bounds video).
+    const DOWNSCALE = Number(process.env.BOUNDS_DOWNSCALE || 4);
+    const PAD_EXTRA = Number(process.env.THUMB_PADDING || 4);
+
+    const smallW = Math.max(1, Math.ceil(safe.width / DOWNSCALE));
+    const smallH = Math.max(1, Math.ceil(safe.height / DOWNSCALE));
+
+    const smallSurface = ck.MakeSurface(smallW, smallH);
+    if (!smallSurface) throw new Error(`CanvasKit gagal membuat surface kecil ${smallW}x${smallH}`);
+    const smallCanvas = smallSurface.getCanvas();
+
+    smallCanvas.save();
+    smallCanvas.scale(1 / DOWNSCALE, 1 / DOWNSCALE);
+    positionAndRender(ck, renderer, smallCanvas, drawable, safe.minX, safe.minY, ck.TRANSPARENT);
+    smallCanvas.restore();
+
+    const smallPixels = decodePng(snapshotToPng(ck, smallSurface));
+    const smallUnion = newUnion();
+    unionVisiblePixels(smallUnion, smallPixels, smallW, smallH);
+    if (typeof smallSurface.delete === "function") smallSurface.delete();
+
+    const pixelUnion = {
+        minX: Math.max(0, Math.floor(smallUnion.minX * DOWNSCALE) - PAD_EXTRA),
+        minY: Math.max(0, Math.floor(smallUnion.minY * DOWNSCALE) - PAD_EXTRA),
+        maxX: Math.min(safe.width - 1, Math.ceil((smallUnion.maxX + 1) * DOWNSCALE) - 1 + PAD_EXTRA),
+        maxY: Math.min(safe.height - 1, Math.ceil((smallUnion.maxY + 1) * DOWNSCALE) - 1 + PAD_EXTRA)
+    };
+
+    const tightBounds = pixelUnionToFinalBounds(pixelUnion, safe);
+
+    // Render ulang persis di ukuran crop yang ketat, background transparan.
+    const surface = ck.MakeSurface(tightBounds.width, tightBounds.height);
+    if (!surface) throw new Error(`CanvasKit gagal membuat surface ${tightBounds.width}x${tightBounds.height}`);
+    const canvas = surface.getCanvas();
+
+    positionAndRender(ck, renderer, canvas, drawable, tightBounds.originX, tightBounds.originY, ck.TRANSPARENT);
+    const finalPng = snapshotToPng(ck, surface);
+
+    fs.mkdirSync(path.dirname(THUMBNAIL_OUT), { recursive: true });
+    fs.writeFileSync(THUMBNAIL_OUT, finalPng);
+
+    if (typeof surface.delete === "function") surface.delete();
+
+    console.log(`Thumbnail disimpan: ${THUMBNAIL_OUT}`);
+    console.log(`Ukuran (pixel-tight): ${tightBounds.width}x${tightBounds.height}`);
+}
+
 async function main() {
     if (MODE === "bounds") {
         await runBoundsMode();
     } else if (MODE === "frames") {
         await runFramesMode();
+    } else if (MODE === "thumbnail") {
+        await runThumbnailMode();
     } else {
         await runSingleMode();
     }
