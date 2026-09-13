@@ -623,44 +623,15 @@ async function runSingleMode() {
 }
 
 // --------------------------------------------------------
-// MODE=thumbnail: ambil 1 frame pertama (t=0) dari animasi
-// "idle" kalau ada, kalau tidak ada pakai animasi "action".
-// Hasil di-crop presis ke bounding box pixel karakter (tidak
-// ada pixel yang kepotong ATAU sisa ruang kosong berlebih),
-// disimpan sebagai PNG transparan.
+// Render 1 frame (posisi skeleton saat ini) jadi PNG dengan
+// crop yang ketat pas ke bounding box pixel karakter (tidak
+// ada pixel kepotong, tidak ada sisa ruang kosong berlebih),
+// background transparan.
 // --------------------------------------------------------
-async function runThumbnailMode() {
-    const ck = await CanvasKitInit();
-    const atlas = await loadTextureAtlas(ck, ATLAS, readFile);
-    const skeletonData = await loadSkeletonData(JSON_FILE, atlas, readFile);
-    const renderer = new SkeletonRenderer(ck);
-
-    const idleAnim = skeletonData.findAnimation(IDLE_NAME);
-    const actionAnim = skeletonData.findAnimation(ACTION_NAME);
-
-    let animName;
-    if (idleAnim) {
-        animName = IDLE_NAME;
-    } else if (actionAnim) {
-        animName = ACTION_NAME;
-        console.log(`Animation "${IDLE_NAME}" tidak ada, thumbnail pakai frame pertama "${ACTION_NAME}".`);
-    } else {
-        const list = skeletonData.animations || [];
-        if (list.length === 0) throw new Error("Tidak ada animasi sama sekali di file ini.");
-        animName = list[0].name;
-        console.log(`Animation "${IDLE_NAME}" & "${ACTION_NAME}" tidak ada, thumbnail pakai animasi "${animName}".`);
-    }
-
-    console.log(`Thumbnail dari animasi: ${animName} (frame pertama, t=0)`);
-
-    const drawable = createDrawable(skeletonData);
-    resetAndStart(drawable, animName, false); // setToSetupPose + apply t=0
-
-    // Bounds kasar (world space) untuk frame ini saja.
+async function renderTightFramePng(ck, renderer, drawable, outPath) {
     const worldBounds = getBounds(drawable.skeleton);
     const safe = makeSafeCanvasSize(worldBounds);
 
-    // Scan piksel presisi (downscale dulu biar cepat, sama seperti bounds video).
     const DOWNSCALE = Number(process.env.BOUNDS_DOWNSCALE || 4);
     const PAD_EXTRA = Number(process.env.THUMB_PADDING || 4);
 
@@ -690,7 +661,6 @@ async function runThumbnailMode() {
 
     const tightBounds = pixelUnionToFinalBounds(pixelUnion, safe);
 
-    // Render ulang persis di ukuran crop yang ketat, background transparan.
     const surface = ck.MakeSurface(tightBounds.width, tightBounds.height);
     if (!surface) throw new Error(`CanvasKit gagal membuat surface ${tightBounds.width}x${tightBounds.height}`);
     const canvas = surface.getCanvas();
@@ -698,13 +668,73 @@ async function runThumbnailMode() {
     positionAndRender(ck, renderer, canvas, drawable, tightBounds.originX, tightBounds.originY, ck.TRANSPARENT);
     const finalPng = snapshotToPng(ck, surface);
 
-    fs.mkdirSync(path.dirname(THUMBNAIL_OUT), { recursive: true });
-    fs.writeFileSync(THUMBNAIL_OUT, finalPng);
+    fs.mkdirSync(path.dirname(outPath), { recursive: true });
+    fs.writeFileSync(outPath, finalPng);
 
     if (typeof surface.delete === "function") surface.delete();
 
-    console.log(`Thumbnail disimpan: ${THUMBNAIL_OUT}`);
-    console.log(`Ukuran (pixel-tight): ${tightBounds.width}x${tightBounds.height}`);
+    console.log(`  Disimpan: ${outPath} (${tightBounds.width}x${tightBounds.height})`);
+}
+
+// --------------------------------------------------------
+// MODE=thumbnail:
+//   - Kalau ada animasi "idle" -> 1 thumbnail dari frame
+//     pertama (t=0) animasi idle (perilaku lama).
+//   - Kalau TIDAK ada animasi "idle" -> 3 thumbnail dari
+//     animasi yang tersedia (biasanya "action"): frame
+//     pertama, tengah, dan terakhir.
+// --------------------------------------------------------
+async function runThumbnailMode() {
+    const ck = await CanvasKitInit();
+    const atlas = await loadTextureAtlas(ck, ATLAS, readFile);
+    const skeletonData = await loadSkeletonData(JSON_FILE, atlas, readFile);
+    const renderer = new SkeletonRenderer(ck);
+
+    const idleAnim = skeletonData.findAnimation(IDLE_NAME);
+    const actionAnim = skeletonData.findAnimation(ACTION_NAME);
+
+    if (idleAnim) {
+        console.log(`Thumbnail dari animasi: ${IDLE_NAME} (frame pertama, t=0)`);
+        const drawable = createDrawable(skeletonData);
+        resetAndStart(drawable, IDLE_NAME, false);
+        await renderTightFramePng(ck, renderer, drawable, THUMBNAIL_OUT);
+        return;
+    }
+
+    // Tidak ada "idle" -> 3 thumbnail dari animasi yang ada.
+    let animName;
+    if (actionAnim) {
+        animName = ACTION_NAME;
+    } else {
+        const list = skeletonData.animations || [];
+        if (list.length === 0) throw new Error("Tidak ada animasi sama sekali di file ini.");
+        animName = list[0].name;
+    }
+
+    const anim = skeletonData.findAnimation(animName);
+    const duration = anim.duration;
+    console.log(`Animation "${IDLE_NAME}" tidak ada. Membuat 3 thumbnail dari "${animName}" (awal, tengah, akhir).`);
+
+    const dir = path.dirname(THUMBNAIL_OUT);
+    const ext = path.extname(THUMBNAIL_OUT) || ".png";
+    const base = path.basename(THUMBNAIL_OUT, ext);
+
+    const frames = [
+        { label: "first", time: 0 },
+        { label: "middle", time: duration / 2 },
+        { label: "last", time: Math.max(0, duration - 1 / FPS) }
+    ];
+
+    for (const f of frames) {
+        const drawable = createDrawable(skeletonData);
+        resetAndStart(drawable, animName, false);
+        if (f.time > 0) {
+            step(drawable, f.time);
+        }
+        console.log(`  Frame ${f.label} (t=${f.time.toFixed(3)}s)`);
+        const outPath = path.join(dir, `${base}_${f.label}${ext}`);
+        await renderTightFramePng(ck, renderer, drawable, outPath);
+    }
 }
 
 async function main() {
