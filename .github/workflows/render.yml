@@ -19,6 +19,22 @@ on:
         description: "Jumlah runner paralel buat render frame"
         required: false
         default: "4"
+      crf:
+        description: "Kualitas video (0=lossless besar, 18=nyaris lossless, 23=seimbang, 28=lebih kecil)"
+        required: false
+        default: "23"
+      preset:
+        description: "Kecepatan encode (ultrafast..veryslow, makin lambat makin kecil filenya)"
+        required: false
+        default: "medium"
+      scale_percent:
+        description: "Skala resolusi akhir dalam % (100=asli, 50=setengah, dst). Turunin kalau video gak kebaca/lag di HP."
+        required: false
+        default: "50"
+      max_dimension:
+        description: "Batas sisi terpendek video, dalam pixel (aspect ratio tetap sama, sisi lain otomatis lebih besar)."
+        required: false
+        default: "2200"
 
 jobs:
   bounds:
@@ -156,9 +172,22 @@ jobs:
           merge-multiple: true
       - name: Encode MP4
         run: |
+          SCALE="${{ github.event.inputs.scale_percent }}"
+          MAXDIM="${{ github.event.inputs.max_dimension }}"
+          if [ -n "$MAXDIM" ]; then
+            # Sisi TERPENDEK (lebar ATAU tinggi, mana yang lebih kecil) dipatok
+            # persis ke MAXDIM pixel, sisi satunya (yang lebih panjang) ikut
+            # membesar proporsional. Ini memastikan kedua sisi tidak pernah
+            # jatuh ke angka kecil (misal mepet 1000), walau aspect ratio
+            # karakternya sangat memanjang.
+            FILTER="scale='if(lt(iw,ih),${MAXDIM},-2)':'if(lt(iw,ih),-2,${MAXDIM})'"
+          else
+            FILTER="scale=trunc(iw*${SCALE}/100/2)*2:trunc(ih*${SCALE}/100/2)*2"
+          fi
           ffmpeg -y -framerate ${{ github.event.inputs.fps }} \
             -i merged/frame_%06d.png \
-            -an -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p \
+            -vf "$FILTER" \
+            -an -c:v libx264 -preset ${{ github.event.inputs.preset }} -crf ${{ github.event.inputs.crf }} -pix_fmt yuv420p \
             -movflags +faststart \
             sara_action_idle.mp4
       - uses: actions/upload-artifact@v4
