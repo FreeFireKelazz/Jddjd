@@ -1,0 +1,634 @@
+hanra_summertraining.png
+	size: 2045, 1946
+	filter: Linear, Linear
+	scale: 0.7
+Acc_1
+	bounds: 564, 1782, 212, 65
+Arm_Cloth_L_1
+	bounds: 1, 533, 235, 494
+	rotate: 90
+Arm_Cloth_L_2
+	bounds: 1186, 1764, 119, 70
+Arm_Cloth_R_1
+	bounds: 816, 981, 207, 381
+	rotate: 90
+Arm_Cloth_R_2
+	bounds: 1631, 1826, 124, 57
+Arm_L
+	bounds: 590, 1189, 163, 770
+	rotate: 90
+Arm_R
+	bounds: 942, 1, 298, 732
+	offsets: 0, 7, 298, 739
+	rotate: 90
+BG_1
+	bounds: 1419, 652, 329, 250
+	offsets: 49, 34, 391, 324
+BG_2
+	bounds: 1198, 943, 262, 209
+BG_Eff_1_1
+	bounds: 983, 1544, 217, 127
+BG_Eff_1_2
+	bounds: 1749, 541, 319, 276
+	rotate: 90
+BG_Eff_2_1
+	bounds: 1599, 1126, 209, 190
+	offsets: 0, 4, 209, 194
+BG_Eff_2_2
+	bounds: 269, 769, 228, 267
+	rotate: 90
+BG_Eff_3
+	bounds: 831, 744, 321, 236
+	offsets: 0, 8, 321, 253
+BG_Light
+	bounds: 423, 230, 260, 518
+	offsets: 21, 18, 292, 538
+	rotate: 90
+BG_Wave_1_1
+	bounds: 797, 1376, 347, 167
+BG_Wave_2_1
+	bounds: 443, 1417, 150, 147
+	offsets: 0, 0, 150, 185
+BG_Wave_2_2
+	bounds: 124, 1805, 62, 61
+BG_Wave_2_3
+	bounds: 340, 998, 213, 218
+	offsets: 0, 0, 213, 312
+	rotate: 90
+BG_Wave_2_4
+	bounds: 1186, 1672, 91, 91
+BG_Wave_2_5
+	bounds: 1278, 1668, 91, 91
+BG_Wave_2_6
+	bounds: 61, 1808, 62, 60
+Ball
+	bounds: 1394, 300, 351, 351
+Clkoth_U_B_1
+	bounds: 1201, 1527, 129, 217
+	rotate: 90
+Clkoth_U_B_2
+	bounds: 1151, 1835, 55, 212
+	rotate: 90
+Collar_L
+	bounds: 1786, 1317, 180, 231
+	rotate: 90
+Collar_R
+	bounds: 1, 255, 277, 421
+	rotate: 90
+Ear_L
+	bounds: 298, 1703, 89, 99
+	rotate: 90
+EyeLid_L
+	bounds: 648, 1930, 52, 15
+EyeLid_R
+	bounds: 1140, 1926, 19, 34
+	offsets: 6, 0, 25, 38
+	rotate: 90
+Eyebrow_L
+	bounds: 1538, 1924, 118, 21
+Eyebrow_R
+	bounds: 164, 1867, 52, 43
+Eyecore_L
+	bounds: 217, 1866, 43, 46
+	rotate: 90
+Eyecore_R
+	bounds: 1128, 1892, 33, 48
+	rotate: 90
+Eyelash_L_1
+	bounds: 1364, 1834, 110, 55
+Eyelash_L_2
+	bounds: 62, 1913, 64, 24
+Eyelash_R_1
+	bounds: 844, 1775, 67, 72
+	offsets: 0, 7, 67, 79
+	rotate: 90
+Eyelash_R_2
+	bounds: 917, 1927, 43, 18
+Eyelight_L
+	bounds: 512, 1932, 13, 22
+	rotate: 90
+Eyelight_R
+	bounds: 488, 1933, 12, 23
+	rotate: 90
+Finger_R
+	bounds: 1885, 1744, 97, 78
+Glass
+	bounds: 537, 748, 293, 232
+Glass_1
+	bounds: 1475, 1830, 55, 155
+	rotate: 90
+Glass_Shadow_re
+	bounds: 917, 1772, 88, 69
+Hair_1
+	bounds: 1370, 1341, 165, 415
+	rotate: 90
+Hair_10
+	bounds: 1153, 689, 253, 265
+	rotate: 90
+Hair_2
+	bounds: 1816, 1823, 58, 166
+	rotate: 90
+Hair_3
+	bounds: 1841, 1637, 106, 168
+	rotate: 90
+Hair_4
+	bounds: 83, 1718, 83, 126
+	offsets: 0, 1, 83, 127
+	rotate: 90
+Hair_5
+	bounds: 834, 1549, 148, 128
+Hair_6
+	bounds: 1461, 903, 222, 330
+	offsets: 0, 0, 242, 330
+	rotate: 90
+Hair_7
+	bounds: 1145, 1353, 173, 224
+	offsets: 0, 77, 497, 301
+	rotate: 90
+Hair_8
+	bounds: 1, 1062, 190, 338
+	offsets: 0, 9, 190, 347
+	rotate: 90
+Hair_9
+	bounds: 489, 1694, 87, 194
+	rotate: 90
+Hair_B_2
+	bounds: 496, 491, 252, 559
+	rotate: 90
+Hair_B_4
+	bounds: 1056, 413, 275, 337
+	rotate: 90
+Hand_L
+	bounds: 1792, 861, 246, 261
+Head
+	bounds: 1, 839, 222, 267
+	rotate: 90
+Light_1
+	bounds: 684, 1691, 90, 90
+Light_10
+	bounds: 1306, 1760, 73, 73
+Light_11
+	bounds: 675, 1848, 52, 51
+Light_12
+	bounds: 833, 1844, 52, 52
+Light_13
+	bounds: 886, 1843, 52, 52
+Light_14
+	bounds: 775, 1684, 90, 90
+Light_15
+	bounds: 1733, 1644, 107, 107
+Light_16
+	bounds: 364, 1793, 65, 65
+Light_17
+	bounds: 366, 1860, 45, 45
+Light_18
+	bounds: 1983, 1822, 59, 59
+Light_19
+	bounds: 497, 1786, 66, 66
+Light_2
+	bounds: 430, 1790, 65, 66
+	rotate: 90
+Light_20
+	bounds: 939, 1842, 52, 52
+Light_21
+	bounds: 1756, 1825, 59, 58
+Light_22
+	bounds: 866, 1681, 90, 90
+Light_23
+	bounds: 777, 1777, 66, 66
+Light_24
+	bounds: 1380, 1760, 73, 73
+Light_25
+	bounds: 580, 1565, 125, 125
+Light_26
+	bounds: 1048, 1674, 90, 137
+	rotate: 90
+Light_27
+	bounds: 957, 1678, 90, 90
+Light_28
+	bounds: 218, 1593, 109, 118
+	rotate: 90
+Light_29
+	bounds: 1006, 1769, 73, 72
+Light_3
+	bounds: 264, 1863, 43, 43
+Light_30
+	bounds: 156, 1450, 142, 142
+Light_31
+	bounds: 299, 1442, 143, 143
+Light_32
+	bounds: 1, 1610, 108, 107
+Light_33
+	bounds: 1822, 1498, 138, 181
+	rotate: 90
+Light_34
+	bounds: 110, 1604, 107, 107
+Light_35
+	bounds: 1587, 1649, 102, 145
+	rotate: 90
+Light_4
+	bounds: 624, 1849, 50, 50
+Light_5
+	bounds: 1, 1811, 59, 59
+Light_6
+	bounds: 412, 1859, 45, 45
+Light_7
+	bounds: 992, 1842, 102, 52
+Light_8
+	bounds: 1454, 1756, 73, 73
+Light_9
+	bounds: 1671, 1885, 38, 38
+Mouth_1
+	bounds: 1657, 1924, 36, 21
+Mouth_2
+	bounds: 989, 1895, 32, 31
+	offsets: 0, 3, 32, 34
+Mouth_3
+	bounds: 1272, 1925, 35, 20
+	offsets: 0, 1, 35, 21
+Neck
+	bounds: 1419, 1512, 136, 181
+	offsets: 0, 0, 160, 181
+	rotate: 90
+Nose
+	bounds: 94, 1938, 7, 15
+	rotate: 90
+Sand_1_1
+	bounds: 1809, 1123, 193, 221
+	rotate: 90
+Sand_1_2
+	bounds: 396, 1212, 193, 204
+	offsets: 0, 2, 197, 214
+Sand_2_1
+	bounds: 261, 1800, 61, 102
+	offsets: 0, 0, 62, 102
+	rotate: 90
+Sand_2_2
+	bounds: 1746, 150, 298, 390
+Sweat_1_1
+	bounds: 961, 1927, 18, 95
+	rotate: 90
+Sweat_1_10
+	bounds: 148, 1937, 8, 27
+	rotate: 90
+Sweat_1_11
+	bounds: 1219, 1891, 33, 190
+	rotate: 90
+Sweat_1_12
+	bounds: 1746, 1923, 22, 50
+	rotate: 90
+Sweat_1_13
+	bounds: 874, 1897, 30, 42
+	rotate: 90
+Sweat_1_14
+	bounds: 872, 1928, 17, 44
+	rotate: 90
+Sweat_1_15
+	bounds: 568, 1931, 14, 62
+	rotate: 90
+Sweat_1_16
+	bounds: 1175, 1926, 19, 34
+	rotate: 90
+Sweat_1_17
+	bounds: 238, 1936, 9, 65
+	rotate: 90
+Sweat_1_18
+	bounds: 488, 1902, 27, 168
+	rotate: 90
+Sweat_1_19
+	bounds: 127, 1912, 24, 76
+	rotate: 90
+Sweat_1_2
+	bounds: 535, 1932, 13, 13
+Sweat_1_20
+	bounds: 728, 1848, 50, 104
+	rotate: 90
+Sweat_1_21
+	bounds: 1, 1915, 23, 60
+	rotate: 90
+Sweat_1_22
+	bounds: 1610, 1752, 70, 274
+	rotate: 90
+Sweat_1_3
+	bounds: 1797, 1923, 22, 87
+	rotate: 90
+Sweat_1_4
+	bounds: 701, 1930, 15, 50
+	rotate: 90
+Sweat_1_5
+	bounds: 350, 1934, 11, 39
+	rotate: 90
+Sweat_1_6
+	bounds: 752, 1929, 16, 72
+	rotate: 90
+Sweat_1_7
+	bounds: 390, 1934, 11, 81
+	rotate: 90
+Sweat_1_8
+	bounds: 1057, 1927, 18, 18
+Sweat_1_9
+	bounds: 1076, 1927, 18, 37
+	rotate: 90
+Sweat_Collar
+	bounds: 176, 1937, 8, 9
+	rotate: 90
+Sweat_Hair_1
+	bounds: 110, 1938, 7, 8
+	rotate: 90
+Sweat_Hair_2
+	bounds: 304, 1936, 9, 10
+	rotate: 90
+Sweat_Hair_3
+	bounds: 631, 1931, 14, 16
+	rotate: 90
+Sweat_Hair_4
+	bounds: 472, 1934, 11, 15
+	rotate: 90
+Sweat_Hair_5
+	bounds: 1370, 1657, 98, 100
+	offsets: 0, 9, 105, 109
+	rotate: 90
+Sweat_Hair_6
+	bounds: 326, 1935, 10, 11
+	rotate: 90
+Sweat_Hair_7
+	bounds: 35, 1939, 6, 6
+Water_1_1
+	bounds: 210, 1712, 87, 87
+Water_1_2
+	bounds: 1095, 1837, 55, 54
+Water_1_3
+	bounds: 1929, 1882, 40, 40
+Water_1_4
+	bounds: 456, 1571, 122, 123
+	rotate: 90
+Water_2_1
+	bounds: 42, 1939, 6, 6
+Water_2_10
+	bounds: 186, 1937, 8, 10
+	rotate: 90
+Water_2_11
+	bounds: 119, 1938, 7, 9
+	rotate: 90
+Water_2_12
+	bounds: 8, 1940, 5, 5
+Water_2_13
+	bounds: 315, 1936, 9, 10
+	rotate: 90
+Water_2_14
+	bounds: 197, 1937, 8, 10
+	rotate: 90
+Water_2_15
+	bounds: 338, 1935, 10, 11
+	rotate: 90
+Water_2_16
+	bounds: 49, 1939, 6, 7
+	rotate: 90
+Water_2_17
+	bounds: 57, 1939, 6, 6
+Water_2_18
+	bounds: 14, 1940, 5, 6
+	rotate: 90
+Water_2_19
+	bounds: 208, 1937, 8, 8
+Water_2_2
+	bounds: 64, 1939, 6, 7
+	rotate: 90
+Water_2_20
+	bounds: 72, 1939, 6, 6
+Water_2_21
+	bounds: 129, 1938, 7, 9
+	rotate: 90
+Water_2_22
+	bounds: 1, 1941, 6, 4
+Water_2_3
+	bounds: 21, 1940, 5, 6
+	rotate: 90
+Water_2_4
+	bounds: 217, 1937, 8, 10
+	rotate: 90
+Water_2_5
+	bounds: 79, 1939, 6, 7
+	rotate: 90
+Water_2_6
+	bounds: 28, 1940, 5, 6
+	rotate: 90
+Water_2_7
+	bounds: 228, 1937, 8, 9
+	rotate: 90
+Water_2_8
+	bounds: 87, 1939, 6, 6
+Water_2_9
+	bounds: 139, 1938, 7, 8
+	rotate: 90
+Water_3_1
+	bounds: 1308, 1925, 27, 20
+Water_3_10
+	bounds: 1177, 1892, 41, 33
+Water_3_11
+	bounds: 301, 1907, 36, 27
+Water_3_12
+	bounds: 1410, 1890, 42, 34
+Water_3_13
+	bounds: 423, 1905, 35, 28
+Water_3_14
+	bounds: 917, 1896, 40, 30
+Water_3_15
+	bounds: 238, 1910, 34, 25
+Water_3_16
+	bounds: 204, 1911, 33, 25
+Water_3_17
+	bounds: 657, 1900, 39, 29
+Water_3_18
+	bounds: 1336, 1925, 28, 20
+Water_3_19
+	bounds: 1022, 1895, 39, 31
+Water_3_2
+	bounds: 697, 1900, 37, 29
+Water_3_20
+	bounds: 825, 1929, 25, 16
+Water_3_21
+	bounds: 1453, 1890, 43, 34
+Water_3_22
+	bounds: 735, 1899, 36, 29
+Water_3_23
+	bounds: 772, 1899, 38, 29
+Water_3_24
+	bounds: 1365, 1925, 28, 20
+Water_3_25
+	bounds: 338, 1906, 27, 27
+Water_3_26
+	bounds: 811, 1899, 29, 29
+Water_3_27
+	bounds: 841, 1898, 32, 29
+Water_3_28
+	bounds: 366, 1906, 27, 28
+	rotate: 90
+Water_3_29
+	bounds: 458, 1856, 45, 48
+	rotate: 90
+Water_3_3
+	bounds: 1694, 1924, 28, 21
+Water_3_30
+	bounds: 1831, 1883, 39, 41
+	rotate: 90
+Water_3_31
+	bounds: 58, 1871, 61, 41
+Water_3_32
+	bounds: 1577, 1886, 51, 37
+Water_3_33
+	bounds: 1885, 1923, 23, 22
+Water_3_34
+	bounds: 120, 1869, 43, 42
+Water_3_35
+	bounds: 1497, 1890, 35, 34
+Water_3_36
+	bounds: 459, 1904, 29, 28
+	rotate: 90
+Water_3_37
+	bounds: 1710, 1884, 40, 38
+Water_3_38
+	bounds: 308, 1862, 57, 43
+Water_3_39
+	bounds: 1873, 1883, 55, 39
+Water_3_4
+	bounds: 1114, 1927, 25, 18
+Water_3_40
+	bounds: 2019, 1920, 25, 25
+Water_3_41
+	bounds: 507, 1853, 48, 50
+	rotate: 90
+Water_3_42
+	bounds: 958, 1896, 30, 30
+Water_3_43
+	bounds: 1062, 1895, 32, 31
+Water_3_44
+	bounds: 273, 1909, 26, 27
+	rotate: 90
+Water_3_45
+	bounds: 1723, 1924, 22, 21
+Water_3_46
+	bounds: 1909, 1923, 22, 22
+Water_3_47
+	bounds: 1210, 1926, 19, 19
+Water_3_48
+	bounds: 558, 1853, 65, 48
+Water_3_49
+	bounds: 1095, 1894, 32, 32
+Water_3_5
+	bounds: 1394, 1925, 26, 20
+Water_3_50
+	bounds: 1932, 1923, 23, 22
+Water_3_51
+	bounds: 1751, 1884, 40, 38
+Water_3_52
+	bounds: 1, 1874, 56, 40
+Water_3_53
+	bounds: 1970, 1882, 43, 40
+	offsets: 35, 0, 78, 48
+Water_3_54
+	bounds: 1629, 1886, 37, 41
+	rotate: 90
+Water_3_55
+	bounds: 395, 1906, 27, 27
+Water_3_56
+	bounds: 1421, 1925, 20, 20
+Water_3_57
+	bounds: 1230, 1926, 19, 20
+	rotate: 90
+Water_3_58
+	bounds: 1792, 1884, 38, 38
+Water_3_59
+	bounds: 1442, 1925, 20, 20
+Water_3_6
+	bounds: 1956, 1923, 31, 22
+Water_3_7
+	bounds: 1988, 1923, 30, 22
+Water_3_8
+	bounds: 1463, 1925, 28, 20
+Water_3_9
+	bounds: 1533, 1887, 43, 36
+Water_4_1
+	bounds: 559, 994, 194, 256
+	rotate: 90
+Water_4_2
+	bounds: 1601, 1507, 136, 220
+	offsets: 0, 2, 136, 227
+	rotate: 90
+Water_4_3
+	bounds: 187, 1802, 63, 73
+	rotate: 90
+Water_4_4
+	bounds: 1492, 1925, 22, 20
+Water_4_5
+	bounds: 549, 1932, 13, 18
+	rotate: 90
+Water_4_6
+	bounds: 851, 1929, 20, 16
+Water_4_7
+	bounds: 1515, 1925, 22, 20
+Water_4_8
+	bounds: 1251, 1926, 20, 19
+Water_Big_1
+	bounds: 1528, 1755, 81, 74
+Water_Big_10
+	bounds: 398, 1700, 90, 89
+Water_Big_11
+	bounds: 1, 1266, 183, 204
+	rotate: 90
+Water_Big_2
+	bounds: 1471, 1650, 115, 104
+Water_Big_3
+	bounds: 594, 1386, 202, 169
+Water_Big_4
+	bounds: 1, 1463, 140, 154
+	rotate: 90
+Water_Big_5
+	bounds: 706, 1556, 127, 127
+Water_Big_6
+	bounds: 1, 1729, 78, 81
+	rotate: 90
+Water_Big_7
+	bounds: 337, 1586, 113, 118
+	rotate: 90
+Water_Big_8
+	bounds: 206, 1253, 189, 188
+Water_Big_9
+	bounds: 1361, 1153, 237, 187
+White
+	bounds: 1080, 1765, 105, 69
+	offsets: 0, 0, 106, 69
+
+hanra_summertraining_2.png
+	size: 1970, 1743
+	filter: Linear, Linear
+	scale: 0.7
+BG_Wave_1_2
+	bounds: 973, 704, 464, 519
+	rotate: 90
+Body_re
+	bounds: 1544, 22, 425, 751
+	offsets: 131, 35, 662, 891
+Cloth_B
+	bounds: 973, 320, 538, 383
+Cloth_L
+	bounds: 478, 1105, 394, 637
+Hair_B_1_1
+	bounds: 1, 954, 476, 788
+	offsets: 0, 273, 508, 1061
+Hair_B_1_2
+	bounds: 1, 140, 443, 813
+	offsets: 166, 0, 678, 1414
+Hair_B_3
+	bounds: 445, 297, 656, 527
+	offsets: 0, 0, 659, 539
+	rotate: 90
+Hair_B_5
+	bounds: 973, 1169, 527, 573
+	offsets: 0, 0, 554, 573
+Leg_L
+	bounds: 445, 1, 295, 1098
+	offsets: 215, 0, 510, 1098
+	rotate: 90
+Leg_R
+	bounds: 1544, 774, 340, 968
