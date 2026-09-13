@@ -174,6 +174,7 @@ jobs:
         run: |
           SCALE="${{ github.event.inputs.scale_percent }}"
           MAXDIM="${{ github.event.inputs.max_dimension }}"
+          FILTER=""
           if [ -n "$MAXDIM" ]; then
             # Sisi TERPENDEK (lebar ATAU tinggi, mana yang lebih kecil) dipatok
             # persis ke MAXDIM pixel, sisi satunya (yang lebih panjang) ikut
@@ -181,15 +182,26 @@ jobs:
             # jatuh ke angka kecil (misal mepet 1000), walau aspect ratio
             # karakternya sangat memanjang.
             FILTER="scale='if(lt(iw,ih),${MAXDIM},-2)':'if(lt(iw,ih),-2,${MAXDIM})'"
-          else
+          elif [ -n "$SCALE" ]; then
             FILTER="scale=trunc(iw*${SCALE}/100/2)*2:trunc(ih*${SCALE}/100/2)*2"
           fi
-          ffmpeg -y -framerate ${{ github.event.inputs.fps }} \
-            -i merged/frame_%06d.png \
-            -vf "$FILTER" \
-            -an -c:v libx264 -preset ${{ github.event.inputs.preset }} -crf ${{ github.event.inputs.crf }} -pix_fmt yuv420p \
-            -movflags +faststart \
-            sara_action_idle.mp4
+
+          if [ -n "$FILTER" ]; then
+            echo "Resize aktif: $FILTER"
+            ffmpeg -y -framerate ${{ github.event.inputs.fps }} \
+              -i merged/frame_%06d.png \
+              -vf "$FILTER" \
+              -an -c:v libx264 -preset ${{ github.event.inputs.preset }} -crf ${{ github.event.inputs.crf }} -pix_fmt yuv420p \
+              -movflags +faststart \
+              sara_action_idle.mp4
+          else
+            echo "Tidak ada MAX_DIM/SCALE, pakai resolusi asli (native, tanpa resize)."
+            ffmpeg -y -framerate ${{ github.event.inputs.fps }} \
+              -i merged/frame_%06d.png \
+              -an -c:v libx264 -preset ${{ github.event.inputs.preset }} -crf ${{ github.event.inputs.crf }} -pix_fmt yuv420p \
+              -movflags +faststart \
+              sara_action_idle.mp4
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: rendered-video
