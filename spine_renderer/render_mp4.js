@@ -361,9 +361,18 @@ function pixelUnionToFinalBounds(pixelUnion, safe) {
 }
 
 function makeEvenDimensions(bounds) {
-    // libx264rgb supports odd dimensions, so DO NOT alter dimensions.
-    // This preserves the exact pixel-tight canvas.
-    return bounds;
+    // libx264 (video encode) mewajibkan lebar & tinggi kelipatan 2.
+    // Kalau ganjil, tambah 1 pixel (extend ke kanan/bawah) - efeknya
+    // gak kelihatan (cuma nambah 1 baris/kolom transparan/hitam tipis),
+    // tapi bikin ffmpeg gak reject video-nya.
+    const width = bounds.width % 2 === 0 ? bounds.width : bounds.width + 1;
+    const height = bounds.height % 2 === 0 ? bounds.height : bounds.height + 1;
+
+    return {
+        ...bounds,
+        width,
+        height
+    };
 }
 
 function startFFmpeg(width, height, output) {
