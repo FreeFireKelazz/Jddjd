@@ -1,0 +1,52 @@
+name: Render Spine to MP4
+
+on:
+  workflow_dispatch:
+    inputs:
+      action_name:
+        description: "Nama animasi Action"
+        required: false
+        default: "action"
+      idle_name:
+        description: "Nama animasi Idle"
+        required: false
+        default: "idle"
+      fps:
+        description: "FPS video"
+        required: false
+        default: "60"
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install dependencies
+        working-directory: spine_renderer
+        run: npm install
+
+      - name: Render MP4
+        working-directory: spine_renderer
+        env:
+          ROOT: ${{ github.workspace }}/spine_renderer/output
+          ASSET: ${{ github.workspace }}/spine_renderer/spiker_sara
+          ACTION: ${{ github.event.inputs.action_name }}
+          IDLE: ${{ github.event.inputs.idle_name }}
+          FPS: ${{ github.event.inputs.fps }}
+        run: node render_mp4.js
+
+      - name: Upload MP4 sebagai artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-video
+          path: spine_renderer/output/*.mp4

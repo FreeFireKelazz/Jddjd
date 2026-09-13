@@ -1,0 +1,17 @@
+{
+  "name": "spine_renderer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@esotericsoftware/spine-canvaskit": "^4.2.120",
+    "pngjs": "^7.0.0"
+  }
+}

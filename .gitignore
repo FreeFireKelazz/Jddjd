@@ -1,0 +1,6 @@
+node_modules/
+spine_renderer/output/
+
+# Kalau repo mau dibikin PUBLIC dan asset karakter bukan buatan sendiri,
+# hapus tanda pagar di bawah ini biar folder asset tidak ikut ter-upload:
+# spine_renderer/spiker_sara/
