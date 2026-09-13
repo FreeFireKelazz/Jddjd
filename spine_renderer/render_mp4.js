@@ -188,15 +188,25 @@ function newUnion() {
 }
 
 function makeSequence(skeletonData) {
-    const action = skeletonData.findAnimation(ACTION_NAME);
-    if (!action) throw new Error(`Animation "${ACTION_NAME}" tidak ditemukan.`);
+    const allAnims = skeletonData.animations || [];
+    if (allAnims.length === 0) {
+        throw new Error("Tidak ada animasi sama sekali di file skeleton ini.");
+    }
 
-    const idle = skeletonData.findAnimation(IDLE_NAME);
+    let action = skeletonData.findAnimation(ACTION_NAME);
+    if (!action) {
+        action = allAnims[0];
+        console.log(`Catatan: animation "${ACTION_NAME}" tidak ditemukan.`);
+        console.log(`         Pakai animasi pertama yang tersedia sebagai pengganti: "${action.name}".`);
+    }
+
+    let idle = skeletonData.findAnimation(IDLE_NAME);
+    if (idle && idle.name === action.name) idle = null; // jangan pakai animasi yang sama 2x
     const hasIdle = !!idle;
 
     if (!hasIdle) {
-        console.log(`Catatan: animation "${IDLE_NAME}" tidak ditemukan di file ini.`);
-        console.log(`         Video akan berisi "${ACTION_NAME}" saja (bagian idle dilewati).`);
+        console.log(`Catatan: animation "${IDLE_NAME}" tidak ditemukan di file ini (atau sama dengan action).`);
+        console.log(`         Video akan berisi "${action.name}" saja (bagian idle dilewati).`);
     }
 
     return {
@@ -217,7 +227,7 @@ function totalFramesFor(duration) {
 
 function createSequenceSimulator(skeletonData, sequence) {
     const drawable = createDrawable(skeletonData);
-    resetAndStart(drawable, ACTION_NAME, false);
+    resetAndStart(drawable, sequence.action.name, false);
 
     let currentTime = 0;
     let idleStarted = false;
@@ -226,7 +236,7 @@ function createSequenceSimulator(skeletonData, sequence) {
         if (idleStarted) return;
         idleStarted = true;
         if (sequence.hasIdle) {
-            drawable.animationState.setAnimation(0, IDLE_NAME, false);
+            drawable.animationState.setAnimation(0, sequence.idle.name, false);
         }
         // Kalau tidak ada animasi idle, biarkan pose terakhir dari action
         // tetap dipakai (idleDuration = 0 jadi bagian ini nyaris tidak pernah
@@ -690,30 +700,22 @@ async function runThumbnailMode() {
     const skeletonData = await loadSkeletonData(JSON_FILE, atlas, readFile);
     const renderer = new SkeletonRenderer(ck);
 
-    const idleAnim = skeletonData.findAnimation(IDLE_NAME);
-    const actionAnim = skeletonData.findAnimation(ACTION_NAME);
+    // Pakai resolusi nama animasi yang sama dengan video (auto-fallback
+    // ke animasi pertama kalau "action"/"idle" tidak ditemukan).
+    const sequence = makeSequence(skeletonData);
 
-    if (idleAnim) {
-        console.log(`Thumbnail dari animasi: ${IDLE_NAME} (frame pertama, t=0)`);
+    if (sequence.hasIdle) {
+        console.log(`Thumbnail dari animasi: ${sequence.idle.name} (frame pertama, t=0)`);
         const drawable = createDrawable(skeletonData);
-        resetAndStart(drawable, IDLE_NAME, false);
+        resetAndStart(drawable, sequence.idle.name, false);
         await renderTightFramePng(ck, renderer, drawable, THUMBNAIL_OUT);
         return;
     }
 
     // Tidak ada "idle" -> 3 thumbnail dari animasi yang ada.
-    let animName;
-    if (actionAnim) {
-        animName = ACTION_NAME;
-    } else {
-        const list = skeletonData.animations || [];
-        if (list.length === 0) throw new Error("Tidak ada animasi sama sekali di file ini.");
-        animName = list[0].name;
-    }
-
-    const anim = skeletonData.findAnimation(animName);
-    const duration = anim.duration;
-    console.log(`Animation "${IDLE_NAME}" tidak ada. Membuat 3 thumbnail dari "${animName}" (awal, tengah, akhir).`);
+    const animName = sequence.action.name;
+    const duration = sequence.action.duration;
+    console.log(`Tidak ada animasi idle terpisah. Membuat 3 thumbnail dari "${animName}" (awal, tengah, akhir).`);
 
     const dir = path.dirname(THUMBNAIL_OUT);
     const ext = path.extname(THUMBNAIL_OUT) || ".png";
