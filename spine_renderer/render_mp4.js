@@ -31,6 +31,23 @@ const FFMPEG = process.env.FFMPEG || "ffmpeg";
 const ACTION_NAME = process.env.ACTION || "action";
 const IDLE_NAME = process.env.IDLE || "idle";
 
+// --------------------------------------------------------
+// MODE dipakai untuk membagi kerja ke beberapa job GitHub
+// Actions yang jalan paralel:
+//   single -> perilaku lama: hitung bounds + render + encode
+//             langsung jadi 1 mp4 dalam 1 proses (dipakai Termux).
+//   bounds -> cuma hitung ukuran kanvas final (finalBounds) dan
+//             totalFrames, ditulis ke BOUNDS_FILE (json).
+//   frames -> baca BOUNDS_FILE, render frame FRAME_START..FRAME_END
+//             (exclusive) jadi file PNG di folder FRAMES_OUT,
+//             tanpa encode ke mp4.
+// --------------------------------------------------------
+const MODE = process.env.MODE || "single";
+const BOUNDS_FILE = process.env.BOUNDS_FILE || path.join(ROOT, "bounds.json");
+const FRAME_START = Number(process.env.FRAME_START || 0);
+const FRAME_END = Number(process.env.FRAME_END || 0);
+const FRAMES_OUT = process.env.FRAMES_OUT || path.join(ROOT, "frames");
+
 function readFile(file) {
     return fs.readFileSync(file);
 }
@@ -261,23 +278,6 @@ function decodePng(pngBytes) {
     return decoded.data;
 }
 
-// --------------------------------------------------------
-// Fix: surface software CanvasKit di Node menyimpan piksel
-// dengan urutan channel yang ketuker (R<->B) dibanding PNG
-// standar. Fungsi ini membalik channel R dan B sebelum PNG
-// dikirim ke ffmpeg supaya warna keluar benar.
-// --------------------------------------------------------
-function swapRedBlue(pngBytes) {
-    const decoded = PNG.sync.read(pngBytes);
-    const data = decoded.data;
-    for (let i = 0; i < data.length; i += 4) {
-        const r = data[i];
-        data[i] = data[i + 2];
-        data[i + 2] = r;
-    }
-    return PNG.sync.write(decoded);
-}
-
 function unionVisiblePixels(union, pixels, width, height) {
     for (let y = 0; y < height; y++) {
         const row = y * width * 4;
@@ -325,10 +325,10 @@ function startFFmpeg(width, height, output) {
         "-vcodec", "png",
         "-i", "-",
         "-an",
-        "-c:v", "libx264rgb",
+        "-c:v", "libx264",
         "-preset", process.env.PRESET || "medium",
         "-crf", process.env.CRF || "18",
-        "-pix_fmt", "rgb24",
+        "-pix_fmt", "yuv420p",
         "-movflags", "+faststart",
         output
     ];
@@ -352,19 +352,7 @@ function waitForProcess(proc) {
     });
 }
 
-async function main() {
-    console.log("========================================");
-    console.log(" SPINE 4.2.120 -> ACTION + IDLE -> MP4");
-    console.log("========================================");
-
-    fs.mkdirSync(ROOT, { recursive: true });
-
-    console.log("[1/7] Initializing CanvasKit...");
-    const ck = await CanvasKitInit();
-
-    console.log("[2/7] Loading atlas + skeleton...");
-    const atlas = await loadTextureAtlas(ck, ATLAS, readFile);
-    const skeletonData = await loadSkeletonData(JSON_FILE, atlas, readFile);
+function loadSequenceInfo(skeletonData) {
     const sequence = makeSequence(skeletonData);
 
     console.log(`Action : ${sequence.actionDuration.toFixed(6)} sec`);
@@ -378,9 +366,10 @@ async function main() {
 
     console.log(`Frames : ${totalFrames}`);
 
-    // --------------------------------------------------------
-    // PASS 1: find a safe world-space canvas covering every frame.
-    // --------------------------------------------------------
+    return { sequence, totalFrames };
+}
+
+async function computeFinalBounds(ck, skeletonData, sequence, totalFrames, renderer) {
     console.log("[3/7] Scanning Spine world bounds: Action + Idle...");
 
     const worldUnion = newUnion();
@@ -400,16 +389,8 @@ async function main() {
     console.log(`World min: (${worldUnion.minX.toFixed(3)}, ${worldUnion.minY.toFixed(3)})`);
     console.log(`World max: (${worldUnion.maxX.toFixed(3)}, ${worldUnion.maxY.toFixed(3)})`);
 
-    // --------------------------------------------------------
-    // PASS 2: render all frames on the safe canvas and find the
-    // exact union of visible RGBA pixels across Action + Idle.
-    // --------------------------------------------------------
     console.log("  Downscaled bounds scan (cepat) lalu dikonversi balik ke resolusi penuh");
 
-    // Render di resolusi kecil (1/DOWNSCALE) cuma buat cari batas gambar.
-    // Jauh lebih cepat karena PNG yang di-encode/decode jauh lebih kecil.
-    // PAD_EXTRA (dalam piksel resolusi penuh) mengkompensasi detail tipis
-    // (rambut, jari) yang bisa hilang saat downscale.
     const DOWNSCALE = Number(process.env.BOUNDS_DOWNSCALE || 4);
     const PAD_EXTRA = Number(process.env.BOUNDS_PADDING || 16);
 
@@ -419,7 +400,6 @@ async function main() {
     const smallSurface = ck.MakeSurface(smallW, smallH);
     if (!smallSurface) throw new Error(`CanvasKit gagal membuat surface kecil ${smallW}x${smallH}`);
     const smallCanvas = smallSurface.getCanvas();
-    const renderer = new SkeletonRenderer(ck);
     const smallUnion = newUnion();
     const sim2 = createSequenceSimulator(skeletonData, sequence);
     const t2start = Date.now();
@@ -441,8 +421,6 @@ async function main() {
 
     if (typeof smallSurface.delete === "function") smallSurface.delete();
 
-    // Konversi batas dari koordinat kecil balik ke koordinat "safe" resolusi
-    // penuh, ditambah padding ekstra untuk jaga-jaga detail tipis.
     const pixelUnion = {
         minX: Math.max(0, Math.floor(smallUnion.minX * DOWNSCALE) - PAD_EXTRA),
         minY: Math.max(0, Math.floor(smallUnion.minY * DOWNSCALE) - PAD_EXTRA),
@@ -459,11 +437,85 @@ async function main() {
     console.log("Crop: none outside global Action+Idle pixel union");
     console.log("========================================");
 
-    // --------------------------------------------------------
-    // PASS 3: render again directly into the final fixed canvas
-    // and pipe encoded PNG frames to FFmpeg. Black background is used because
-    // ordinary H.264 MP4 does not preserve alpha transparency.
-    // --------------------------------------------------------
+    return finalBounds;
+}
+
+async function runBoundsMode() {
+    fs.mkdirSync(path.dirname(BOUNDS_FILE), { recursive: true });
+
+    const ck = await CanvasKitInit();
+    const atlas = await loadTextureAtlas(ck, ATLAS, readFile);
+    const skeletonData = await loadSkeletonData(JSON_FILE, atlas, readFile);
+    const renderer = new SkeletonRenderer(ck);
+
+    const { sequence, totalFrames } = loadSequenceInfo(skeletonData);
+    const finalBounds = await computeFinalBounds(ck, skeletonData, sequence, totalFrames, renderer);
+
+    fs.writeFileSync(BOUNDS_FILE, JSON.stringify({ finalBounds, totalFrames, fps: FPS }, null, 2));
+    console.log(`Bounds ditulis ke ${BOUNDS_FILE}`);
+}
+
+async function runFramesMode() {
+    const { finalBounds, totalFrames } = JSON.parse(fs.readFileSync(BOUNDS_FILE, "utf8"));
+    const end = FRAME_END > 0 ? Math.min(FRAME_END, totalFrames) : totalFrames;
+
+    fs.mkdirSync(FRAMES_OUT, { recursive: true });
+
+    const ck = await CanvasKitInit();
+    const atlas = await loadTextureAtlas(ck, ATLAS, readFile);
+    const skeletonData = await loadSkeletonData(JSON_FILE, atlas, readFile);
+    const renderer = new SkeletonRenderer(ck);
+    const { sequence } = loadSequenceInfo(skeletonData);
+
+    const sim = createSequenceSimulator(skeletonData, sequence);
+
+    console.log(`Warm-up 0..${FRAME_START} (tanpa render)...`);
+    for (let i = 0; i < FRAME_START; i++) {
+        sim.advanceTo(i / FPS);
+    }
+
+    const surface = ck.MakeSurface(finalBounds.width, finalBounds.height);
+    if (!surface) throw new Error(`CanvasKit gagal membuat surface ${finalBounds.width}x${finalBounds.height}`);
+    const canvas = surface.getCanvas();
+    const t0 = Date.now();
+    const shardTotal = end - FRAME_START;
+
+    console.log(`Rendering frame ${FRAME_START}..${end - 1} -> ${FRAMES_OUT}`);
+
+    for (let i = FRAME_START; i < end; i++) {
+        sim.advanceTo(i / FPS);
+
+        positionAndRender(ck, renderer, canvas, sim.drawable, finalBounds.originX, finalBounds.originY, ck.BLACK);
+
+        const pngBytes = snapshotToPng(ck, surface);
+        const framePath = path.join(FRAMES_OUT, `frame_${String(i).padStart(6, "0")}.png`);
+        fs.writeFileSync(framePath, pngBytes);
+
+        printProgress(i - FRAME_START + 1, shardTotal, t0);
+    }
+
+    if (typeof surface.delete === "function") surface.delete();
+    console.log(`Selesai: ${shardTotal} frame ditulis ke ${FRAMES_OUT}`);
+}
+
+async function runSingleMode() {
+    console.log("========================================");
+    console.log(" SPINE 4.2.120 -> ACTION + IDLE -> MP4");
+    console.log("========================================");
+
+    fs.mkdirSync(ROOT, { recursive: true });
+
+    console.log("[1/7] Initializing CanvasKit...");
+    const ck = await CanvasKitInit();
+
+    console.log("[2/7] Loading atlas + skeleton...");
+    const atlas = await loadTextureAtlas(ck, ATLAS, readFile);
+    const skeletonData = await loadSkeletonData(JSON_FILE, atlas, readFile);
+    const renderer = new SkeletonRenderer(ck);
+    const { sequence, totalFrames } = loadSequenceInfo(skeletonData);
+
+    const finalBounds = await computeFinalBounds(ck, skeletonData, sequence, totalFrames, renderer);
+
     console.log("[5/7] Creating final surface + FFmpeg...");
     console.log("  Frame transport: PNG image2pipe -> FFmpeg (no raw pixel readback)");
 
@@ -481,10 +533,9 @@ async function main() {
         const t = i / FPS;
         sim3.advanceTo(t);
 
-        // Black background for standard MP4.
         positionAndRender(ck, renderer, finalCanvas, sim3.drawable, finalBounds.originX, finalBounds.originY, ck.BLACK);
 
-        const pngBytes = swapRedBlue(snapshotToPng(ck, finalSurface));
+        const pngBytes = snapshotToPng(ck, finalSurface);
 
         if (!ff.stdin.write(pngBytes)) {
             await new Promise(resolve => ff.stdin.once("drain", resolve));
@@ -510,6 +561,16 @@ async function main() {
     console.log("Idle  : original duration, once (NO LOOP)");
     console.log("Scale : 1:1");
     console.log("========================================");
+}
+
+async function main() {
+    if (MODE === "bounds") {
+        await runBoundsMode();
+    } else if (MODE === "frames") {
+        await runFramesMode();
+    } else {
+        await runSingleMode();
+    }
 }
 
 main().catch(error => {

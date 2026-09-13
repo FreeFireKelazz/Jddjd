@@ -15,38 +15,112 @@ on:
         description: "FPS video"
         required: false
         default: "60"
+      shards:
+        description: "Jumlah runner paralel buat render frame"
+        required: false
+        default: "4"
 
 jobs:
-  render:
+  bounds:
     runs-on: ubuntu-latest
+    outputs:
+      total_frames: ${{ steps.read_bounds.outputs.total_frames }}
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "20"
-
-      - name: Install ffmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
-
       - name: Install dependencies
         working-directory: spine_renderer
         run: npm install
-
-      - name: Render MP4
+      - name: Hitung bounds
         working-directory: spine_renderer
         env:
-          ROOT: ${{ github.workspace }}/spine_renderer/output
+          MODE: bounds
           ASSET: ${{ github.workspace }}/spine_renderer/spiker_sara
+          BOUNDS_FILE: ${{ github.workspace }}/spine_renderer/output/bounds.json
           ACTION: ${{ github.event.inputs.action_name }}
           IDLE: ${{ github.event.inputs.idle_name }}
           FPS: ${{ github.event.inputs.fps }}
         run: node render_mp4.js
+      - name: Baca total_frames dari bounds.json
+        id: read_bounds
+        run: echo "total_frames=$(node -pe 'JSON.parse(require("fs").readFileSync("spine_renderer/output/bounds.json")).totalFrames')" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bounds-data
+          path: spine_renderer/output/bounds.json
 
-      - name: Upload MP4 sebagai artifact
-        uses: actions/upload-artifact@v4
+  frames:
+    needs: bounds
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        working-directory: spine_renderer
+        run: npm install
+      - uses: actions/download-artifact@v4
+        with:
+          name: bounds-data
+          path: spine_renderer/output
+      - name: Hitung frame range untuk shard ini
+        id: range
+        run: |
+          node -e '
+            const total = ${{ needs.bounds.outputs.total_frames }};
+            const shardCount = ${{ github.event.inputs.shards }};
+            const k = ${{ matrix.shard }};
+            if (k >= shardCount) { console.log("start=0"); console.log("end=0"); process.exit(0); }
+            const start = Math.floor((k * total) / shardCount);
+            const end = Math.floor(((k + 1) * total) / shardCount);
+            console.log("start=" + start);
+            console.log("end=" + end);
+          ' >> "$GITHUB_OUTPUT"
+      - name: Render frame range
+        if: ${{ matrix.shard < fromJSON(github.event.inputs.shards) }}
+        working-directory: spine_renderer
+        env:
+          MODE: frames
+          ASSET: ${{ github.workspace }}/spine_renderer/spiker_sara
+          BOUNDS_FILE: ${{ github.workspace }}/spine_renderer/output/bounds.json
+          FRAMES_OUT: ${{ github.workspace }}/spine_renderer/output/frames
+          FRAME_START: ${{ steps.range.outputs.start }}
+          FRAME_END: ${{ steps.range.outputs.end }}
+          ACTION: ${{ github.event.inputs.action_name }}
+          IDLE: ${{ github.event.inputs.idle_name }}
+          FPS: ${{ github.event.inputs.fps }}
+        run: node render_mp4.js
+      - uses: actions/upload-artifact@v4
+        if: ${{ matrix.shard < fromJSON(github.event.inputs.shards) }}
+        with:
+          name: frames-shard-${{ matrix.shard }}
+          path: spine_renderer/output/frames
+
+  encode:
+    needs: [bounds, frames]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: frames-shard-*
+          path: merged
+          merge-multiple: true
+      - name: Encode MP4
+        run: |
+          ffmpeg -y -framerate ${{ github.event.inputs.fps }} \
+            -i merged/frame_%06d.png \
+            -an -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p \
+            -movflags +faststart \
+            sara_action_idle.mp4
+      - uses: actions/upload-artifact@v4
         with:
           name: rendered-video
-          path: spine_renderer/output/*.mp4
+          path: sara_action_idle.mp4
