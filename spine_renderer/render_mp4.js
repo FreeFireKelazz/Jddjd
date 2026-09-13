@@ -21,9 +21,47 @@ import { PNG } from "pngjs";
 // Kalau tidak diset, tetap pakai default lama di Termux.
 const ROOT = process.env.ROOT || "/storage/emulated/0/pes/spine_renderer";
 const ASSET = process.env.ASSET || "/storage/emulated/0/pes/spiker_sara";
-const ATLAS = path.join(ASSET, "wingspike_sara.atlas");
-const JSON_FILE = path.join(ASSET, "wingspike_sara.json");
-const OUTPUT = path.join(ROOT, "sara_action_idle.mp4");
+
+// --------------------------------------------------------
+// Auto-detect nama file .atlas/.json di dalam folder ASSET,
+// jadi tidak perlu hardcode nama karakter (mis. "wingspike_sara").
+// Ganti karakter cukup ganti isi folder ASSET, kode tidak perlu diubah.
+// Asumsi standar Spine: <nama>.atlas berpasangan dengan <nama>.json.
+// --------------------------------------------------------
+function findSpineFiles(assetDir) {
+    if (!fs.existsSync(assetDir)) {
+        throw new Error(`Folder asset tidak ditemukan: ${assetDir}`);
+    }
+
+    const entries = fs.readdirSync(assetDir);
+    const atlasFile = entries.find(f => f.toLowerCase().endsWith(".atlas"));
+    if (!atlasFile) {
+        throw new Error(`Tidak ada file .atlas di dalam ${assetDir}`);
+    }
+
+    const baseName = atlasFile.slice(0, -".atlas".length);
+    let jsonFile = entries.find(f => f === `${baseName}.json`);
+    if (!jsonFile) {
+        // Fallback: file .json apa saja di folder itu (kalau nama tidak persis sama).
+        jsonFile = entries.find(f => f.toLowerCase().endsWith(".json"));
+    }
+    if (!jsonFile) {
+        throw new Error(`Tidak ada file .json (skeleton) di dalam ${assetDir}`);
+    }
+
+    console.log(`Asset terdeteksi: ${atlasFile} + ${jsonFile}`);
+
+    return {
+        atlas: path.join(assetDir, atlasFile),
+        json: path.join(assetDir, jsonFile),
+        baseName
+    };
+}
+
+const SPINE_FILES = findSpineFiles(ASSET);
+const ATLAS = SPINE_FILES.atlas;
+const JSON_FILE = SPINE_FILES.json;
+const OUTPUT = path.join(ROOT, `${SPINE_FILES.baseName}_action_idle.mp4`);
 
 const FPS = Number(process.env.FPS || 60);
 const PADDING = Number(process.env.PADDING || 2);

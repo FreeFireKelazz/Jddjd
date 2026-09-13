@@ -33,11 +33,23 @@ jobs:
       - name: Install dependencies
         working-directory: spine_renderer
         run: npm install
+      - name: Deteksi folder asset (cari *.atlas)
+        id: asset
+        working-directory: spine_renderer
+        run: |
+          FOUND=$(find . -maxdepth 2 -iname "*.atlas" -not -path "./node_modules/*" -not -path "./output/*" | head -n1)
+          if [ -z "$FOUND" ]; then
+            echo "Tidak ada file .atlas ditemukan di dalam spine_renderer/*" >&2
+            exit 1
+          fi
+          DIR=$(dirname "$FOUND")
+          echo "path=${{ github.workspace }}/spine_renderer/$(basename "$DIR")" >> "$GITHUB_OUTPUT"
+          echo "Asset folder terdeteksi: $DIR"
       - name: Hitung bounds
         working-directory: spine_renderer
         env:
           MODE: bounds
-          ASSET: ${{ github.workspace }}/spine_renderer/spiker_sara
+          ASSET: ${{ steps.asset.outputs.path }}
           BOUNDS_FILE: ${{ github.workspace }}/spine_renderer/output/bounds.json
           ACTION: ${{ github.event.inputs.action_name }}
           IDLE: ${{ github.event.inputs.idle_name }}
@@ -69,6 +81,17 @@ jobs:
         with:
           name: bounds-data
           path: spine_renderer/output
+      - name: Deteksi folder asset (cari *.atlas)
+        id: asset
+        working-directory: spine_renderer
+        run: |
+          FOUND=$(find . -maxdepth 2 -iname "*.atlas" -not -path "./node_modules/*" -not -path "./output/*" | head -n1)
+          if [ -z "$FOUND" ]; then
+            echo "Tidak ada file .atlas ditemukan di dalam spine_renderer/*" >&2
+            exit 1
+          fi
+          DIR=$(dirname "$FOUND")
+          echo "path=${{ github.workspace }}/spine_renderer/$(basename "$DIR")" >> "$GITHUB_OUTPUT"
       - name: Hitung frame range untuk shard ini
         id: range
         run: |
@@ -87,7 +110,7 @@ jobs:
         working-directory: spine_renderer
         env:
           MODE: frames
-          ASSET: ${{ github.workspace }}/spine_renderer/spiker_sara
+          ASSET: ${{ steps.asset.outputs.path }}
           BOUNDS_FILE: ${{ github.workspace }}/spine_renderer/output/bounds.json
           FRAMES_OUT: ${{ github.workspace }}/spine_renderer/output/frames
           FRAME_START: ${{ steps.range.outputs.start }}
