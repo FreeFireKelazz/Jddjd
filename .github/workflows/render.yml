@@ -35,6 +35,10 @@ on:
         description: "Batas sisi terpendek video, dalam pixel (aspect ratio tetap sama, sisi lain otomatis lebih besar)."
         required: false
         default: "2200"
+      format:
+        description: "Format output: 'mp4' (background hitam, kompatibel di mana saja) atau 'webm' (background transparan, VP9)."
+        required: false
+        default: "webm"
 
 jobs:
   bounds:
@@ -152,6 +156,7 @@ jobs:
           ACTION: ${{ github.event.inputs.action_name }}
           IDLE: ${{ github.event.inputs.idle_name }}
           FPS: ${{ github.event.inputs.fps }}
+          ALPHA: ${{ github.event.inputs.format == 'webm' && '1' || '0' }}
         run: node render_mp4.js
       - uses: actions/upload-artifact@v4
         if: ${{ matrix.shard < fromJSON(github.event.inputs.shards) }}
@@ -186,23 +191,36 @@ jobs:
             FILTER="scale=trunc(iw*${SCALE}/100/2)*2:trunc(ih*${SCALE}/100/2)*2"
           fi
 
+          FORMAT="${{ github.event.inputs.format }}"
+          VF_ARGS=()
           if [ -n "$FILTER" ]; then
             echo "Resize aktif: $FILTER"
-            ffmpeg -y -framerate ${{ github.event.inputs.fps }} \
-              -i merged/frame_%06d.png \
-              -vf "$FILTER" \
-              -an -c:v libx264 -preset ${{ github.event.inputs.preset }} -crf ${{ github.event.inputs.crf }} -pix_fmt yuv420p \
-              -movflags +faststart \
-              sara_action_idle.mp4
+            VF_ARGS=(-vf "$FILTER")
           else
             echo "Tidak ada MAX_DIM/SCALE, pakai resolusi asli (native, tanpa resize)."
+          fi
+
+          if [ "$FORMAT" = "webm" ]; then
+            echo "Encode WebM (VP9, background TRANSPARAN)..."
             ffmpeg -y -framerate ${{ github.event.inputs.fps }} \
               -i merged/frame_%06d.png \
+              "${VF_ARGS[@]}" \
+              -an -c:v libvpx-vp9 -pix_fmt yuva420p -crf ${{ github.event.inputs.crf }} -b:v 0 \
+              -auto-alt-ref 0 \
+              output.webm
+            OUTFILE="output.webm"
+          else
+            echo "Encode MP4 (H.264, background HITAM - MP4 tidak support transparansi)..."
+            ffmpeg -y -framerate ${{ github.event.inputs.fps }} \
+              -i merged/frame_%06d.png \
+              "${VF_ARGS[@]}" \
               -an -c:v libx264 -preset ${{ github.event.inputs.preset }} -crf ${{ github.event.inputs.crf }} -pix_fmt yuv420p \
               -movflags +faststart \
-              sara_action_idle.mp4
+              output.mp4
+            OUTFILE="output.mp4"
           fi
+          echo "OUTFILE=$OUTFILE" >> "$GITHUB_ENV"
       - uses: actions/upload-artifact@v4
         with:
           name: rendered-video
-          path: sara_action_idle.mp4
+          path: ${{ env.OUTFILE }}
