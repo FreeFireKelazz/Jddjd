@@ -551,10 +551,12 @@ async function runFramesMode() {
 
     console.log(`Rendering frame ${FRAME_START}..${end - 1} -> ${FRAMES_OUT}`);
 
+    const bgColor = process.env.ALPHA === "1" ? ck.TRANSPARENT : ck.BLACK;
+
     for (let i = FRAME_START; i < end; i++) {
         sim.advanceTo(i / FPS);
 
-        positionAndRender(ck, renderer, canvas, sim.drawable, finalBounds.originX, finalBounds.originY, ck.BLACK);
+        positionAndRender(ck, renderer, canvas, sim.drawable, finalBounds.originX, finalBounds.originY, bgColor);
 
         const pngBytes = snapshotToPng(ck, surface);
         const framePath = path.join(FRAMES_OUT, `frame_${String(i).padStart(6, "0")}.png`);
