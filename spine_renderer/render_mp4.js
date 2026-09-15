@@ -292,6 +292,25 @@ function makeSafeCanvasSize(worldBounds) {
     };
 }
 
+function parseChromaColor(ck, hex) {
+    if (!hex) return null;
+    const clean = hex.replace(/^#/, "").trim();
+    if (!/^[0-9a-fA-F]{6}$/.test(clean)) {
+        console.warn(`CHROMA_COLOR "${hex}" bukan hex 6-digit valid (contoh: 00B140), fallback ke hitam.`);
+        return null;
+    }
+    const r = parseInt(clean.slice(0, 2), 16);
+    const g = parseInt(clean.slice(2, 4), 16);
+    const b = parseInt(clean.slice(4, 6), 16);
+    return ck.Color(r, g, b, 1);
+}
+
+function resolveBgColor(ck) {
+    if (process.env.ALPHA === "1") return ck.TRANSPARENT;
+    const chroma = parseChromaColor(ck, process.env.CHROMA_COLOR);
+    return chroma || ck.BLACK;
+}
+
 function positionAndRender(ck, renderer, canvas, drawable, originX, originY, clearColor) {
     const skeleton = drawable.skeleton;
 
@@ -551,7 +570,7 @@ async function runFramesMode() {
 
     console.log(`Rendering frame ${FRAME_START}..${end - 1} -> ${FRAMES_OUT}`);
 
-    const bgColor = process.env.ALPHA === "1" ? ck.TRANSPARENT : ck.BLACK;
+    const bgColor = resolveBgColor(ck);
 
     for (let i = FRAME_START; i < end; i++) {
         sim.advanceTo(i / FPS);
@@ -604,7 +623,7 @@ async function runSingleMode() {
         const t = i / FPS;
         sim3.advanceTo(t);
 
-        positionAndRender(ck, renderer, finalCanvas, sim3.drawable, finalBounds.originX, finalBounds.originY, ck.BLACK);
+        positionAndRender(ck, renderer, finalCanvas, sim3.drawable, finalBounds.originX, finalBounds.originY, resolveBgColor(ck));
 
         const pngBytes = snapshotToPng(ck, finalSurface);
 

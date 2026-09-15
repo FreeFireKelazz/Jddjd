@@ -36,9 +36,13 @@ on:
         required: false
         default: "2200"
       format:
-        description: "Format output: 'mp4' (background hitam, kompatibel di mana saja) atau 'webm' (background transparan, VP9)."
+        description: "Format output: 'mp4' (background hitam), 'webm' (background transparan, VP9, cuma kebaca di browser/PC tertentu), atau 'chromakey' (background warna solid pilihan sendiri, buat di-key manual di app editor)."
         required: false
         default: "webm"
+      chroma_color:
+        description: "Warna background kalau format=chromakey, hex 6-digit TANPA tanda # (contoh: 00B140 untuk hijau chroma standar)."
+        required: false
+        default: "00B140"
 
 jobs:
   bounds:
@@ -157,6 +161,7 @@ jobs:
           IDLE: ${{ github.event.inputs.idle_name }}
           FPS: ${{ github.event.inputs.fps }}
           ALPHA: ${{ github.event.inputs.format == 'webm' && '1' || '0' }}
+          CHROMA_COLOR: ${{ github.event.inputs.format == 'chromakey' && github.event.inputs.chroma_color || '' }}
         run: node render_mp4.js
       - uses: actions/upload-artifact@v4
         if: ${{ matrix.shard < fromJSON(github.event.inputs.shards) }}
@@ -210,7 +215,11 @@ jobs:
               output.webm
             OUTFILE="output.webm"
           else
-            echo "Encode MP4 (H.264, background HITAM - MP4 tidak support transparansi)..."
+            if [ "$FORMAT" = "chromakey" ]; then
+              echo "Encode MP4 (H.264, background warna solid '${{ github.event.inputs.chroma_color }}' - key manual di app editor)..."
+            else
+              echo "Encode MP4 (H.264, background HITAM - MP4 tidak support transparansi)..."
+            fi
             ffmpeg -y -framerate ${{ github.event.inputs.fps }} \
               -i merged/frame_%06d.png \
               "${VF_ARGS[@]}" \
