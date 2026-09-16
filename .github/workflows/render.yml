@@ -11,6 +11,10 @@ on:
         description: "Nama animasi Idle"
         required: false
         default: "idle"
+      idle_duration:
+        description: "Paksa durasi idle jadi sekian detik (di-loop otomatis kalau lebih panjang dari durasi asli). Kosongkan buat pakai durasi asli animasinya."
+        required: false
+        default: ""
       fps:
         description: "FPS video"
         required: false
@@ -77,6 +81,7 @@ jobs:
           BOUNDS_FILE: ${{ github.workspace }}/spine_renderer/output/bounds.json
           ACTION: ${{ github.event.inputs.action_name }}
           IDLE: ${{ github.event.inputs.idle_name }}
+          IDLE_DURATION: ${{ github.event.inputs.idle_duration }}
           FPS: ${{ github.event.inputs.fps }}
         run: node render_mp4.js
       - name: Generate thumbnail (frame pertama, crop presisi)
@@ -87,6 +92,7 @@ jobs:
           THUMBNAIL_OUT: ${{ github.workspace }}/spine_renderer/output/thumbnail.png
           ACTION: ${{ github.event.inputs.action_name }}
           IDLE: ${{ github.event.inputs.idle_name }}
+          IDLE_DURATION: ${{ github.event.inputs.idle_duration }}
         run: node render_mp4.js
       - uses: actions/upload-artifact@v4
         with:
@@ -159,6 +165,7 @@ jobs:
           FRAME_END: ${{ steps.range.outputs.end }}
           ACTION: ${{ github.event.inputs.action_name }}
           IDLE: ${{ github.event.inputs.idle_name }}
+          IDLE_DURATION: ${{ github.event.inputs.idle_duration }}
           FPS: ${{ github.event.inputs.fps }}
           ALPHA: ${{ github.event.inputs.format == 'webm' && '1' || '0' }}
           CHROMA_COLOR: ${{ github.event.inputs.format == 'chromakey' && github.event.inputs.chroma_color || '' }}
@@ -211,6 +218,7 @@ jobs:
               -i merged/frame_%06d.png \
               "${VF_ARGS[@]}" \
               -an -c:v libvpx-vp9 -pix_fmt yuva420p -crf ${{ github.event.inputs.crf }} -b:v 0 \
+              -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv \
               -auto-alt-ref 0 \
               output.webm
             OUTFILE="output.webm"
@@ -224,6 +232,7 @@ jobs:
               -i merged/frame_%06d.png \
               "${VF_ARGS[@]}" \
               -an -c:v libx264 -preset ${{ github.event.inputs.preset }} -crf ${{ github.event.inputs.crf }} -pix_fmt yuv420p \
+              -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv \
               -movflags +faststart \
               output.mp4
             OUTFILE="output.mp4"

@@ -209,13 +209,25 @@ function makeSequence(skeletonData) {
         console.log(`         Video akan berisi "${action.name}" saja (bagian idle dilewati).`);
     }
 
+    let idleDuration = hasIdle ? idle.duration : 0;
+    if (hasIdle && process.env.IDLE_DURATION !== undefined && process.env.IDLE_DURATION !== "") {
+        const override = Number(process.env.IDLE_DURATION);
+        if (Number.isFinite(override) && override >= 0) {
+            idleDuration = override;
+            const loopCount = idle.duration > 0 ? (override / idle.duration).toFixed(2) : "0";
+            console.log(`Catatan: IDLE_DURATION di-set ${override}s (native "${idle.name}" = ${idle.duration.toFixed(3)}s, di-loop ~${loopCount}x).`);
+        } else {
+            console.log(`Catatan: IDLE_DURATION "${process.env.IDLE_DURATION}" tidak valid, pakai durasi native idle.`);
+        }
+    }
+
     return {
         action,
         idle: hasIdle ? idle : null,
         hasIdle,
         actionDuration: action.duration,
-        idleDuration: hasIdle ? idle.duration : 0,
-        totalDuration: action.duration + (hasIdle ? idle.duration : 0)
+        idleDuration,
+        totalDuration: action.duration + idleDuration
     };
 }
 
@@ -236,7 +248,7 @@ function createSequenceSimulator(skeletonData, sequence) {
         if (idleStarted) return;
         idleStarted = true;
         if (sequence.hasIdle) {
-            drawable.animationState.setAnimation(0, sequence.idle.name, false);
+            drawable.animationState.setAnimation(0, sequence.idle.name, true);
         }
         // Kalau tidak ada animasi idle, biarkan pose terakhir dari action
         // tetap dipakai (idleDuration = 0 jadi bagian ini nyaris tidak pernah
@@ -648,7 +660,9 @@ async function runSingleMode() {
     console.log(`Frames : ${totalFrames}`);
     console.log(`Time   : ${(totalFrames / FPS).toFixed(6)} sec`);
     console.log("Action: original duration, once");
-    console.log("Idle  : original duration, once (NO LOOP)");
+    console.log(sequence.idleDuration !== (sequence.idle ? sequence.idle.duration : 0)
+        ? `Idle  : durasi di-override (loop otomatis kalau lebih panjang dari animasi asli)`
+        : "Idle  : original duration, once (NO LOOP)");
     console.log("Scale : 1:1");
     console.log("========================================");
 }
