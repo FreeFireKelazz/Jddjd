@@ -1,0 +1,187 @@
+gitae.png
+	size: 2008, 1978
+	filter: Linear, Linear
+Arm_L
+	bounds: 320, 1002, 292, 643
+	offsets: 0, 0, 365, 825
+	rotate: 90
+Arm_L _2
+	bounds: 897, 1594, 223, 360
+	offsets: 10, 180, 302, 726
+	rotate: 90
+Arm_L_1
+	bounds: 358, 1356, 272, 387
+	rotate: 90
+Ball
+	bounds: 1430, 874, 382, 383
+	rotate: 90
+Body_1_B
+	bounds: 746, 1295, 298, 303
+	rotate: 90
+Body_2
+	bounds: 1421, 417, 456, 586
+	rotate: 90
+Body_2_B
+	bounds: 417, 1938, 79, 39
+	offsets: 0, 0, 83, 39
+Eff_1_1
+	bounds: 579, 1851, 109, 83
+Eff_1_2
+	bounds: 1756, 1916, 68, 61
+Eff_1_3
+	bounds: 1, 1879, 79, 74
+Eff_1_4
+	bounds: 387, 1858, 77, 191
+	rotate: 90
+Eff_1_5
+	bounds: 1315, 1918, 59, 130
+	rotate: 90
+Eff_1_6
+	bounds: 1040, 1818, 99, 277
+	rotate: 90
+Eff_1_7
+	bounds: 693, 1, 487, 611
+	rotate: 90
+Eff_1_8
+	bounds: 1050, 1257, 248, 734
+	rotate: 90
+Eff_2
+	bounds: 1, 619, 416, 382
+	offsets: 0, 0, 528, 415
+Eff_3_1
+	bounds: 71, 1954, 23, 24
+	rotate: 90
+Eff_3_10
+	bounds: 1249, 1920, 65, 57
+Eff_3_11
+	bounds: 619, 1935, 42, 47
+	rotate: 90
+Eff_3_12
+	bounds: 1689, 1917, 60, 66
+	rotate: 90
+Eff_3_2
+	bounds: 1188, 1923, 54, 60
+	rotate: 90
+Eff_3_3
+	bounds: 765, 1933, 44, 48
+	rotate: 90
+Eff_3_4
+	bounds: 667, 1935, 42, 43
+	rotate: 90
+Eff_3_5
+	bounds: 1898, 1904, 73, 78
+	rotate: 90
+Eff_3_6
+	bounds: 1318, 1811, 106, 150
+	rotate: 90
+Eff_3_7
+	bounds: 306, 1864, 77, 80
+	rotate: 90
+Eff_3_8
+	bounds: 995, 1927, 50, 56
+	rotate: 90
+Eff_3_9
+	bounds: 497, 1937, 42, 40
+Eyeball_L
+	bounds: 248, 1945, 36, 32
+Eyeball_R
+	bounds: 213, 1948, 29, 34
+	rotate: 90
+Eyebrow_L
+	bounds: 1052, 1927, 135, 50
+Eyebrow_R
+	bounds: 211, 1867, 76, 94
+	offsets: 0, 0, 76, 99
+	rotate: 90
+Eyelash_L_1
+	bounds: 875, 1930, 119, 47
+Eyelash_L_2
+	bounds: 1446, 1918, 96, 59
+	offsets: 0, 6, 99, 65
+Eyelash_L_3
+	bounds: 285, 1944, 51, 33
+Eyelash_R_1
+	bounds: 1825, 1911, 72, 66
+Eyelash_R_2
+	bounds: 814, 1933, 60, 44
+	offsets: 0, 3, 60, 47
+Eyelash_R_3
+	bounds: 172, 1951, 26, 40
+	rotate: 90
+Hair_1
+	bounds: 1613, 1749, 274, 161
+	offsets: 0, 1, 274, 162
+Hair_2
+	bounds: 1, 1424, 356, 268
+Hair_3
+	bounds: 1549, 1506, 455, 242
+Hair_4
+	bounds: 1469, 1795, 143, 122
+Hair_5
+	bounds: 689, 1840, 89, 219
+	offsets: 0, 0, 92, 219
+	rotate: 90
+Hair_6
+	bounds: 873, 489, 547, 388
+	offsets: 22, 7, 569, 451
+Hair_B
+	bounds: 418, 595, 454, 406
+Hair_B_1
+	bounds: 1, 1957, 20, 69
+	offsets: 0, 2, 20, 71
+	rotate: 90
+Hair_babo
+	bounds: 399, 1654, 196, 236
+	rotate: 90
+Hand_L
+	bounds: 1, 1119, 304, 318
+	rotate: 90
+Head
+	bounds: 964, 878, 378, 465
+	offsets: 0, 0, 378, 478
+	rotate: 90
+Leg_R
+	bounds: 1, 164, 430, 691
+	offsets: 18, 0, 448, 691
+	rotate: 90
+Mouth_1
+	bounds: 81, 1876, 129, 74
+Mouth_2
+	bounds: 540, 1936, 78, 41
+	offsets: 0, 0, 103, 69
+Mouth_3
+	bounds: 909, 1832, 130, 94
+Neck_1
+	bounds: 1, 1706, 169, 183
+	rotate: 90
+Neck_2
+	bounds: 1258, 1534, 260, 290
+	rotate: 90
+Nose
+	bounds: 1543, 1918, 59, 145
+	rotate: 90
+Pants_B
+	bounds: 185, 1693, 164, 213
+	offsets: 12, 0, 176, 213
+	rotate: 90
+Shadow
+	bounds: 636, 1629, 260, 210
+Shadow_2
+	bounds: 337, 1942, 79, 35
+White_L
+	bounds: 96, 1952, 75, 25
+White_R
+	bounds: 711, 1935, 53, 42
+
+gitae_2.png
+	size: 1888, 957
+	filter: Linear, Linear
+Arm_R
+	bounds: 1, 56, 900, 873
+	offsets: 56, 0, 956, 873
+	rotate: 90
+Body_1
+	bounds: 875, 1, 577, 955
+	offsets: 0, 0, 601, 955
+Leg_L
+	bounds: 1453, 111, 434, 845
