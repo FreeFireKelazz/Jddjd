@@ -1,0 +1,41 @@
+UltSiwooNew.png
+size:1484,1030
+filter:Linear,Linear
+scale:0.5
+눈_감음
+bounds:326,34,126,39
+눈_뜸
+bounds:1434,331,127,48
+rotate:90
+뒷 팔
+bounds:1198,262,234,196
+뒷 팔_1
+bounds:469,67,134,320
+rotate:90
+땀
+bounds:709,460,773,568
+머리카락_01
+bounds:791,44,251,173
+offsets:0,39,251,267
+머리카락_02
+bounds:1375,151,102,109
+offsets:36,94,150,267
+머리카락_03
+bounds:1239,142,134,118
+offsets:0,0,135,118
+머리카락_04
+bounds:1239,51,89,129
+offsets:0,1,92,130
+rotate:90
+몸통
+bounds:2,203,705,825
+offsets:0,44,800,869
+바지
+bounds:709,219,487,239
+앞 팔
+bounds:2,75,465,126
+앞 팔_땀
+bounds:2,2,322,71
+얼굴
+bounds:1044,15,193,202
+offsets:16,2,212,282
