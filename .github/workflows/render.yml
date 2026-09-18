@@ -110,7 +110,7 @@ jobs:
             spine_renderer/output/thumbnail_last.png
           if-no-files-found: error
           retention-days: 90
-        id: read_bounds
+      - id: read_bounds
         run: echo "total_frames=$(node -pe 'JSON.parse(require("fs").readFileSync("spine_renderer/output/bounds.json")).totalFrames')" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
