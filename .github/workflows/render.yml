@@ -40,9 +40,9 @@ on:
         required: false
         default: "50"
       max_dimension:
-        description: "Batas sisi terpendek video, dalam pixel (aspect ratio tetap sama, sisi lain otomatis lebih besar)."
+        description: "Batas sisi terpendek video, dalam pixel (aspect ratio tetap sama, sisi lain otomatis lebih besar). Kosongkan untuk resolusi asli (tidak ada resize)."
         required: false
-        default: "2200"
+        default: ""
       format:
         description: "Format output: 'mp4' (background hitam), 'webm' (background transparan, VP9, cuma kebaca di browser/PC tertentu), atau 'chromakey' (background warna solid pilihan sendiri, buat di-key manual di app editor)."
         required: false
