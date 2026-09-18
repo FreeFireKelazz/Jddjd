@@ -7,6 +7,10 @@ on:
         description: "Nama animasi Action"
         required: false
         default: "action"
+      action_duration:
+        description: "Paksa durasi action jadi sekian detik (0 = skip total, langsung loncat ke idle; kosongkan buat durasi asli)."
+        required: false
+        default: ""
       idle_name:
         description: "Nama animasi Idle"
         required: false
@@ -80,6 +84,7 @@ jobs:
           ASSET: ${{ steps.asset.outputs.path }}
           BOUNDS_FILE: ${{ github.workspace }}/spine_renderer/output/bounds.json
           ACTION: ${{ github.event.inputs.action_name }}
+          ACTION_DURATION: ${{ github.event.inputs.action_duration }}
           IDLE: ${{ github.event.inputs.idle_name }}
           IDLE_DURATION: ${{ github.event.inputs.idle_duration }}
           FPS: ${{ github.event.inputs.fps }}
@@ -91,6 +96,7 @@ jobs:
           ASSET: ${{ steps.asset.outputs.path }}
           THUMBNAIL_OUT: ${{ github.workspace }}/spine_renderer/output/thumbnail.png
           ACTION: ${{ github.event.inputs.action_name }}
+          ACTION_DURATION: ${{ github.event.inputs.action_duration }}
           IDLE: ${{ github.event.inputs.idle_name }}
           IDLE_DURATION: ${{ github.event.inputs.idle_duration }}
         run: node render_mp4.js
@@ -103,13 +109,14 @@ jobs:
             spine_renderer/output/thumbnail_middle.png
             spine_renderer/output/thumbnail_last.png
           if-no-files-found: error
-      - name: Baca total_frames dari bounds.json
+          retention-days: 90
         id: read_bounds
         run: echo "total_frames=$(node -pe 'JSON.parse(require("fs").readFileSync("spine_renderer/output/bounds.json")).totalFrames')" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
           name: bounds-data
           path: spine_renderer/output/bounds.json
+          retention-days: 1
 
   frames:
     needs: bounds
@@ -164,6 +171,7 @@ jobs:
           FRAME_START: ${{ steps.range.outputs.start }}
           FRAME_END: ${{ steps.range.outputs.end }}
           ACTION: ${{ github.event.inputs.action_name }}
+          ACTION_DURATION: ${{ github.event.inputs.action_duration }}
           IDLE: ${{ github.event.inputs.idle_name }}
           IDLE_DURATION: ${{ github.event.inputs.idle_duration }}
           FPS: ${{ github.event.inputs.fps }}
@@ -175,10 +183,14 @@ jobs:
         with:
           name: frames-shard-${{ matrix.shard }}
           path: spine_renderer/output/frames
+          retention-days: 1
 
   encode:
     needs: [bounds, frames]
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
     steps:
       - name: Install ffmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
@@ -242,3 +254,15 @@ jobs:
         with:
           name: rendered-video
           path: ${{ env.OUTFILE }}
+          retention-days: 90
+      - name: Hapus artifact sementara (frames-shard-* & bounds-data)
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" \
+            --jq '.artifacts[] | select(.name | test("^frames-shard-|^bounds-data$")) | .id' \
+          | while read -r id; do
+              echo "Menghapus artifact id=$id ..."
+              gh api -X DELETE "repos/${{ github.repository }}/actions/artifacts/$id" || true
+            done
