@@ -1,0 +1,148 @@
+iris_model.png
+size:2023,1921
+filter:Linear,Linear
+scale:0.43
+눈꺼풀 오
+bounds:1,2,108,45
+rotate:90
+눈꺼풀 왼
+bounds:215,44,66,44
+rotate:90
+눈동자 오
+bounds:271,3,45,40
+눈동자 왼
+bounds:154,2,36,40
+rotate:90
+눈썹 오
+bounds:136,11,99,17
+rotate:90
+눈썹 왼
+bounds:313,65,39,45
+뒷머리
+bounds:997,444,287,290
+offsets:77,0,364,290
+땀
+bounds:353,82,28,28
+땀 (턱)
+bounds:470,920,13,10
+offsets:8,0,31,15
+땀1
+bounds:910,393,86,538
+땀_A0
+bounds:218,1,26,42
+땀_A1
+bounds:260,59,29,51
+땀_B1
+bounds:260,44,20,14
+offsets:0,0,23,21
+땀_B2
+bounds:245,2,25,41
+땀_C1
+bounds:281,918,12,56
+rotate:90
+레이어 25
+bounds:387,920,10,82
+offsets:0,6,10,88
+rotate:90
+레이어 26
+bounds:342,49,15,15
+레이어 27
+bounds:195,2,22,36
+레이어 28
+bounds:351,919,11,35
+offsets:4,0,15,35
+rotate:90
+레이어 29
+bounds:281,45,16,13
+레이어 30
+bounds:47,1,6,5
+레이어 31
+bounds:59,2,4,4
+레이어 32
+bounds:64,2,4,4
+레이어 33
+bounds:54,1,4,5
+레이어 35
+bounds:69,2,4,3
+rotate:90
+레이어 36
+bounds:338,918,12,12
+머리 오
+bounds:1160,24,284,419
+머리핀
+bounds:869,932,140,234
+물
+bounds:317,11,126,32
+물병 뒤 손가락
+bounds:1527,742,118,115
+offsets:0,1,118,116
+rotate:90
+바보털
+bounds:1396,735,125,130
+rotate:90
+빈물병
+bounds:1643,669,367,191
+offsets:0,15,367,206
+상체
+bounds:1406,861,505,545
+offsets:0,0,505,822
+rotate:90
+손
+bounds:1690,550,118,110
+rotate:90
+손1
+bounds:1707,25,271,141
+쌍꺼풀 오
+bounds:186,39,71,28
+rotate:90
+쌍꺼풀 왼
+bounds:290,64,46,22
+rotate:90
+앞머리
+bounds:910,14,249,378
+offsets:2,7,361,390
+어깨
+bounds:1010,735,385,271
+offsets:0,0,397,271
+엄지
+bounds:47,7,88,103
+offsets:2,0,94,103
+옆머리
+bounds:1445,167,279,538
+rotate:90
+입
+bounds:319,48,22,16
+잔머리
+bounds:154,39,31,71
+종아리
+bounds:562,11,347,919
+종아리1
+bounds:281,931,587,989
+코
+bounds:136,4,6,6
+팔
+bounds:1010,1007,159,391
+rotate:90
+팔2
+bounds:1,918,279,1002
+offsets:0,0,300,1002
+피부
+bounds:1285,447,287,267
+rotate:90
+허리
+bounds:1406,1367,553,616
+rotate:90
+허벅지
+bounds:1,111,806,560
+rotate:90
+허벅지1
+bounds:869,1167,753,536
+rotate:90
+홍조
+bounds:1445,17,261,149
+offsets:0,0,261,154
+홍조 빗금
+bounds:298,44,20,19
+흰자
+bounds:1553,458,210,136
+rotate:90
