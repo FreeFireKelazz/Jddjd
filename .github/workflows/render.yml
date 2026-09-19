@@ -19,6 +19,14 @@ on:
         description: "Paksa durasi idle jadi sekian detik (di-loop otomatis kalau lebih panjang dari durasi asli). Kosongkan buat pakai durasi asli animasinya."
         required: false
         default: ""
+      extra_name:
+        description: "OPSIONAL, kosongkan kalau tidak perlu. Nama animasi ke-3 yang diputar sekali setelah idle (mis. Idle_Loop). Fitur ini nonaktif total kalau dikosongkan."
+        required: false
+        default: ""
+      extra_duration:
+        description: "OPSIONAL. Paksa durasi segmen ke-3 jadi sekian detik (di-loop otomatis). Kosongkan buat pakai durasi asli animasinya."
+        required: false
+        default: ""
       fps:
         description: "FPS video"
         required: false
@@ -87,6 +95,8 @@ jobs:
           ACTION_DURATION: ${{ github.event.inputs.action_duration }}
           IDLE: ${{ github.event.inputs.idle_name }}
           IDLE_DURATION: ${{ github.event.inputs.idle_duration }}
+          EXTRA: ${{ github.event.inputs.extra_name }}
+          EXTRA_DURATION: ${{ github.event.inputs.extra_duration }}
           FPS: ${{ github.event.inputs.fps }}
         run: node render_mp4.js
       - name: Generate thumbnail (frame pertama, crop presisi)
@@ -99,6 +109,8 @@ jobs:
           ACTION_DURATION: ${{ github.event.inputs.action_duration }}
           IDLE: ${{ github.event.inputs.idle_name }}
           IDLE_DURATION: ${{ github.event.inputs.idle_duration }}
+          EXTRA: ${{ github.event.inputs.extra_name }}
+          EXTRA_DURATION: ${{ github.event.inputs.extra_duration }}
         run: node render_mp4.js
       - uses: actions/upload-artifact@v4
         with:
@@ -174,6 +186,8 @@ jobs:
           ACTION_DURATION: ${{ github.event.inputs.action_duration }}
           IDLE: ${{ github.event.inputs.idle_name }}
           IDLE_DURATION: ${{ github.event.inputs.idle_duration }}
+          EXTRA: ${{ github.event.inputs.extra_name }}
+          EXTRA_DURATION: ${{ github.event.inputs.extra_duration }}
           FPS: ${{ github.event.inputs.fps }}
           ALPHA: ${{ github.event.inputs.format == 'webm' && '1' || '0' }}
           CHROMA_COLOR: ${{ github.event.inputs.format == 'chromakey' && github.event.inputs.chroma_color || '' }}
