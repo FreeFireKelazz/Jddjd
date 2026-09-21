@@ -1,0 +1,76 @@
+siwoo_ult.png
+	size: 1910, 648
+	filter: Linear, Linear
+	scale: 0.3
+눈동자_L
+	bounds: 207, 9, 17, 15
+	offsets: 4, 4, 34, 23
+	rotate: 90
+눈동자_R
+	bounds: 223, 10, 16, 14
+	offsets: 11, 2, 42, 21
+	rotate: 90
+눈썹_L
+	bounds: 163, 8, 43, 18
+눈썹_R
+	bounds: 238, 12, 44, 14
+	offsets: 0, 2, 44, 16
+다리
+	bounds: 1535, 3, 323, 387
+레이어 1
+	bounds: 165, 27, 53, 103
+	rotate: 90
+망토_1
+	bounds: 691, 167, 426, 480
+	offsets: 0, 13, 794, 509
+망토_2
+	bounds: 361, 147, 500, 329
+	offsets: 4, 0, 504, 329
+	rotate: 90
+망토_3
+	bounds: 1118, 205, 416, 442
+머리
+	bounds: 480, 16, 130, 148
+	offsets: 0, 0, 137, 148
+	rotate: 90
+머리_Shadow
+	bounds: 629, 16, 130, 148
+	offsets: 0, 0, 137, 148
+	rotate: 90
+머리카락_뒤
+	bounds: 361, 3, 143, 118
+	rotate: 90
+머리카락_앞
+	bounds: 778, 8, 210, 158
+머리카락_앞_Shadow
+	bounds: 989, 8, 210, 158
+몸통
+	bounds: 1, 81, 359, 566
+	offsets: 1, 0, 360, 566
+속눈썹_L
+	bounds: 13, 2, 39, 24
+	offsets: 0, 0, 45, 24
+속눈썹_R
+	bounds: 53, 3, 38, 23
+	offsets: 3, 0, 42, 23
+손
+	bounds: 1200, 15, 85, 126
+	offsets: 0, 0, 86, 126
+	rotate: 90
+옷 카라
+	bounds: 1, 27, 163, 53
+입
+	bounds: 1, 1, 25, 11
+	rotate: 90
+팔_1
+	bounds: 1535, 391, 256, 374
+	rotate: 90
+팔_2
+	bounds: 1200, 101, 103, 301
+	rotate: 90
+흰자_L
+	bounds: 92, 5, 34, 21
+	offsets: 0, 1, 40, 23
+흰자_R
+	bounds: 127, 7, 35, 19
+	offsets: 3, 1, 42, 21
