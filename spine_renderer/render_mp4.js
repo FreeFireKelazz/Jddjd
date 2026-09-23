@@ -153,10 +153,15 @@ function lockBones(skeleton) {
             console.warn(`Catatan: LOCK_BONE_TRANSLATE "${name}" tidak ditemukan di skeleton ini.`);
             continue;
         }
-        // balikin ke posisi setup pose (rest), abaikan keyframe translate apapun
-        // yang di-set animasi untuk bone ini di frame sekarang.
+        // balikin ke posisi setup pose (rest), abaikan keyframe translate,
+        // scale, DAN rotation apapun yang di-set animasi untuk bone ini di
+        // frame sekarang (beberapa bone kontrol punya animasi scale/rotate
+        // ekstrem yang tidak mau kita ikuti, bukan cuma translate).
         bone.x = bone.data.x;
         bone.y = bone.data.y;
+        bone.scaleX = bone.data.scaleX;
+        bone.scaleY = bone.data.scaleY;
+        bone.rotation = bone.data.rotation;
     }
 }
 
