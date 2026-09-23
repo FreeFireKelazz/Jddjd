@@ -1,0 +1,178 @@
+NN_PSD.png
+size:2017,1969
+filter:Linear,Linear
+scale:0.4
+L_Eye
+bounds:1108,344,42,12
+L_Eyebraw
+bounds:1845,419,45,6
+L_Iris
+bounds:1935,50,14,11
+L_White
+bounds:1063,126,33,11
+offsets:0,0,34,12
+R_Eye
+bounds:1992,1669,36,23
+rotate:90
+R_Eyebraw
+bounds:1063,139,43,20
+R_Iris
+bounds:1613,384,13,11
+R_White
+bounds:856,734,28,18
+offsets:0,0,30,18
+rotate:90
+뒷다리
+bounds:1551,417,292,306
+뒷머리
+bounds:1188,11,86,104
+rotate:90
+뒷발
+bounds:1956,1813,154,55
+offsets:23,0,292,306
+rotate:90
+레이어 1
+bounds:541,5,20,7
+레이어 10
+bounds:856,721,11,16
+rotate:90
+레이어 11
+bounds:741,161,8,12
+rotate:90
+레이어 12
+bounds:707,2,17,52
+rotate:90
+레이어 13
+bounds:1956,1661,7,6
+레이어 14
+bounds:1410,72,12,34
+rotate:90
+레이어 15
+bounds:1993,1763,22,48
+레이어 16
+bounds:1519,717,6,24
+rotate:90
+레이어 17
+bounds:1993,1755,6,6
+레이어 18
+bounds:1152,350,6,28
+rotate:90
+레이어 19
+bounds:1782,108,5,5
+레이어 2
+bounds:1613,397,13,18
+레이어 20
+bounds:1353,63,55,34
+레이어 3
+bounds:1391,55,6,6
+레이어 4
+bounds:1848,725,5,5
+레이어 5
+bounds:790,714,4,5
+rotate:90
+레이어 6
+bounds:1956,1669,36,34
+rotate:90
+레이어 7
+bounds:738,21,28,35
+rotate:90
+레이어 8
+bounds:2,2,23,24
+레이어 9
+bounds:761,2,17,14
+rotate:90
+리본 뒤
+bounds:707,21,82,29
+rotate:90
+리본 앞
+bounds:1956,1707,104,35
+rotate:90
+머리
+bounds:398,3,141,169
+머리카락
+bounds:541,105,198,176
+목걸이 긴쪽
+bounds:1789,230,177,185
+목걸이 긴쪽 포인트
+bounds:1353,35,26,36
+rotate:90
+목걸이 짧은쪽
+bounds:1848,732,145,167
+rotate:90
+목걸이 짧은쪽 포인트
+bounds:27,12,14,26
+rotate:90
+몸 복사
+bounds:790,358,390,354
+물방울
+bounds:2,174,537,742
+offsets:1,0,538,743
+보드
+bounds:876,714,579,641
+rotate:90
+보드 끈
+bounds:1108,99,300,239
+안경빛표현
+bounds:541,14,164,89
+안경알
+bounds:1782,25,151,80
+안경테
+bounds:1765,725,152,81
+rotate:90
+안경하이라이트
+bounds:741,187,94,47
+rotate:90
+안경하이라이트_Mask_Left
+bounds:790,764,152,81
+rotate:90
+안경하이라이트_Mask_Right
+bounds:1628,32,152,81
+앞다리
+bounds:541,283,247,633
+오른팔
+bounds:2,28,394,144
+오른팔 옷
+bounds:915,41,146,118
+오른팔 팔찌
+bounds:1935,63,29,42
+옷 오른팔쪽
+bounds:1789,107,121,180
+rotate:90
+옷 오른팔쪽 뒤
+bounds:1765,879,414,248
+rotate:90
+옷 왼팔쪽
+bounds:1410,86,216,252
+옷 왼팔쪽 뒤
+bounds:1845,427,166,116
+왼팔
+bounds:1519,725,244,568
+왼팔 옷 아래
+bounds:790,720,64,42
+왼팔 옷 위
+bounds:1845,545,178,160
+rotate:90
+윗머리
+bounds:741,51,172,108
+입
+bounds:741,171,40,14
+잔머리 앞
+bounds:1551,341,60,74
+잔머리 앞 그림자
+bounds:1294,34,57,63
+잔머리 옆
+bounds:1063,22,123,75
+파도 꼬리
+bounds:790,161,195,316
+rotate:90
+파도 몸통
+bounds:2,918,872,1049
+파도 포말
+bounds:876,1295,672,1078
+rotate:90
+파도_1
+bounds:1628,115,159,300
+파도_2
+bounds:1182,340,367,372
+파도_3
+bounds:1294,2,15,30
