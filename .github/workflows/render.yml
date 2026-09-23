@@ -59,6 +59,10 @@ on:
         description: "Warna background kalau format=chromakey, hex 6-digit TANPA tanda # (contoh: 00B140 untuk hijau chroma standar)."
         required: false
         default: "00B140"
+      bounds_mode:
+        description: "'dynamic' = scan semua frame, tidak pernah kepotong (default). 'game' = pakai bounds statis dari skeleton.json, persis kayak game asli (lebih cepat, bisa kepotong kalau pose keluar kotak)."
+        required: false
+        default: "dynamic"
 
 jobs:
   bounds:
@@ -98,6 +102,7 @@ jobs:
           EXTRA: ${{ github.event.inputs.extra_name }}
           EXTRA_DURATION: ${{ github.event.inputs.extra_duration }}
           FPS: ${{ github.event.inputs.fps }}
+          BOUNDS: ${{ github.event.inputs.bounds_mode }}
         run: node render_mp4.js
       - name: Generate thumbnail (frame pertama, crop presisi)
         working-directory: spine_renderer
