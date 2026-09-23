@@ -1,0 +1,262 @@
+Sara_Spine.png
+	size: 2036, 2043
+	filter: Linear, Linear
+	scale: 0.3
+back shore2
+	bounds: 1453, 1579, 166, 198
+	rotate: 90
+back_hair
+	bounds: 714, 1911, 152, 98
+back_hair2
+	bounds: 1588, 1319, 262, 245
+	offsets: 0, 0, 262, 248
+back_shore
+	bounds: 642, 640, 662, 413
+ball_01
+	bounds: 881, 1100, 284, 284
+	offsets: 10, 11, 307, 307
+ball_02
+	bounds: 1167, 1055, 284, 284
+	offsets: 10, 11, 307, 307
+face
+	bounds: 213, 1472, 227, 209
+	offsets: 12, 0, 239, 209
+flower1
+	bounds: 460, 1798, 125, 130
+	rotate: 90
+flower2
+	bounds: 610, 1921, 102, 93
+front_hair
+	bounds: 1508, 1885, 106, 227
+	rotate: 90
+hair2
+	bounds: 968, 1618, 154, 302
+	rotate: 90
+l_eye3
+	bounds: 1247, 1999, 68, 42
+	offsets: 3, 9, 71, 52
+l_eye322
+	bounds: 762, 2013, 43, 28
+	offsets: 3, 19, 71, 52
+l_eyes_01
+	bounds: 953, 2004, 46, 37
+	offsets: 8, 3, 71, 52
+l_eyes_02
+	bounds: 870, 2009, 36, 32
+	offsets: 14, 7, 71, 52
+l_eyes_03
+	bounds: 908, 2006, 43, 35
+	offsets: 15, 1, 71, 52
+l_shore
+	bounds: 595, 1137, 264, 284
+	rotate: 90
+l_shore2
+	bounds: 2, 2, 636, 1176
+	rotate: 90
+l_skirt2
+	bounds: 645, 1638, 321, 152
+r_eye21
+	bounds: 715, 2014, 45, 27
+	offsets: 16, 2, 61, 35
+r_eye22
+	bounds: 807, 2011, 61, 30
+	offsets: 0, 5, 61, 35
+r_eye22_2
+	bounds: 116, 2032, 36, 9
+	offsets: 25, 25, 61, 35
+r_eye23
+	bounds: 486, 2019, 33, 22
+	offsets: 27, 5, 61, 35
+r_eye24
+	bounds: 367, 2022, 59, 19
+	offsets: 2, 0, 61, 35
+r_skirt_back
+	bounds: 202, 1683, 131, 246
+	rotate: 90
+ribbon
+	bounds: 1001, 2004, 56, 37
+	offsets: 0, 0, 59, 37
+right_leg
+	bounds: 2, 824, 311, 638
+	rotate: 90
+레이어 1
+	bounds: 1616, 1747, 125, 320
+	rotate: 90
+레이어 10
+	bounds: 428, 2022, 19, 56
+	offsets: 0, 0, 19, 59
+	rotate: 90
+레이어 103
+	bounds: 565, 2016, 25, 28
+	rotate: 90
+레이어 11
+	bounds: 1758, 1992, 49, 81
+	rotate: 90
+레이어 17
+	bounds: 595, 2016, 25, 52
+	rotate: 90
+레이어 2
+	bounds: 1737, 1874, 266, 108
+레이어 23
+	bounds: 1833, 1566, 179, 201
+	rotate: 90
+레이어 35
+	bounds: 344, 1934, 86, 135
+	rotate: 90
+레이어 37
+	bounds: 1908, 1987, 54, 59
+	rotate: 90
+레이어 39
+	bounds: 1111, 2002, 39, 57
+	rotate: 90
+레이어 40
+	bounds: 193, 2028, 13, 44
+	rotate: 90
+레이어 41
+	bounds: 35, 2034, 7, 33
+	rotate: 90
+레이어 42
+	bounds: 649, 2016, 25, 25
+레이어 43
+	bounds: 521, 2018, 42, 23
+레이어 44
+	bounds: 239, 2028, 16, 13
+레이어 45
+	bounds: 1648, 1993, 48, 108
+	rotate: 90
+레이어 46
+	bounds: 1170, 2001, 40, 75
+	rotate: 90
+레이어 47
+	bounds: 1969, 1984, 57, 58
+	rotate: 90
+레이어 48
+	bounds: 1242, 1341, 344, 236
+레이어 49
+	bounds: 166, 2029, 12, 25
+	rotate: 90
+레이어 50
+	bounds: 257, 2026, 15, 44
+	rotate: 90
+레이어 51
+	bounds: 1094, 1899, 97, 261
+	rotate: 90
+레이어 52
+	bounds: 2, 1961, 71, 77
+	rotate: 90
+레이어 53
+	bounds: 303, 2023, 18, 18
+레이어 54
+	bounds: 304, 1172, 259, 289
+	rotate: 90
+레이어 55
+	bounds: 989, 1386, 251, 230
+레이어 56
+	bounds: 868, 1907, 224, 95
+레이어 57
+	bounds: 2, 1221, 249, 300
+	rotate: 90
+레이어 60
+	bounds: 1453, 921, 396, 577
+	rotate: 90
+레이어 61
+	bounds: 198, 1940, 144, 81
+레이어 62
+	bounds: 1306, 412, 507, 621
+	offsets: 0, 11, 507, 632
+	rotate: 90
+레이어 62_Hand
+	bounds: 2, 1685, 198, 143
+	offsets: 231, 197, 507, 632
+레이어 64
+	bounds: 81, 1955, 71, 115
+	rotate: 90
+레이어 65
+	bounds: 592, 1792, 113, 458
+	rotate: 90
+레이어 66
+	bounds: 1419, 1996, 45, 80
+	rotate: 90
+레이어 67
+	bounds: 1317, 1998, 54, 43
+레이어 68
+	bounds: 1373, 1998, 43, 44
+	offsets: 0, 0, 43, 47
+	rotate: 90
+레이어 72
+	bounds: 1501, 1996, 145, 45
+	offsets: 1, 1, 146, 46
+레이어 73
+	bounds: 450, 1647, 143, 193
+	rotate: 90
+레이어 74
+	bounds: 1272, 1589, 164, 179
+	rotate: 90
+레이어 75
+	bounds: 1052, 1774, 123, 227
+	rotate: 90
+레이어 77
+	bounds: 1357, 1889, 105, 149
+	rotate: 90
+레이어 78
+	bounds: 481, 1925, 89, 127
+	rotate: 90
+레이어 79
+	bounds: 727, 1403, 213, 260
+	rotate: 90
+레이어 80
+	bounds: 442, 1433, 203, 283
+	rotate: 90
+레이어 81
+	bounds: 676, 2016, 37, 25
+레이어 82
+	bounds: 2, 1830, 235, 108
+레이어 83
+	bounds: 1281, 1759, 136, 128
+레이어 84
+	bounds: 1419, 1755, 195, 128
+레이어 85
+	bounds: 1653, 1575, 170, 178
+	rotate: 90
+레이어 86
+	bounds: 2, 1487, 209, 194
+레이어 88
+	bounds: 239, 1816, 219, 116
+	offsets: 1, 0, 223, 116
+레이어 89
+	bounds: 98, 2033, 16, 8
+레이어 90
+	bounds: 70, 2034, 12, 7
+레이어 92
+	bounds: 154, 2032, 9, 10
+	rotate: 90
+레이어 93
+	bounds: 2, 2036, 18, 5
+레이어 94
+	bounds: 22, 2035, 6, 11
+	rotate: 90
+레이어 95
+	bounds: 84, 2034, 7, 12
+	rotate: 90
+레이어 96
+	bounds: 1841, 1991, 65, 50
+레이어 97
+	bounds: 323, 2023, 42, 18
+레이어 98
+	bounds: 1059, 2004, 50, 37
+
+Sara_Spine_2.png
+	size: 1917, 1494
+	filter: Linear, Linear
+	scale: 0.3
+right_arm
+	bounds: 2, 324, 680, 1233
+	rotate: 90
+레이어 18
+	bounds: 2, 1006, 486, 1913
+	offsets: 525, 0, 1245, 2038
+	rotate: 90
+레이어 58
+	bounds: 1237, 2, 1002, 654
+	offsets: 0, 0, 1002, 707
+	rotate: 90
