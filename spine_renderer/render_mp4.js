@@ -68,12 +68,6 @@ const PADDING = Number(process.env.PADDING || 2);
 const FFMPEG = process.env.FFMPEG || "ffmpeg";
 const ACTION_NAME = process.env.ACTION || "action";
 const IDLE_NAME = process.env.IDLE || "idle";
-// Segmen ke-3, OPSIONAL. Beda dari ACTION/IDLE (yang punya default
-// "action"/"idle"), EXTRA_NAME defaultnya KOSONG - kalau env var ini
-// tidak diisi, fitur ini nonaktif total, tidak ada pencarian animasi
-// apapun, dan seluruh alur render persis sama seperti sebelum fitur
-// ini ada.
-const EXTRA_NAME = process.env.EXTRA || "";
 
 // --------------------------------------------------------
 // MODE dipakai untuk membagi kerja ke beberapa job GitHub
@@ -136,6 +130,29 @@ function createDrawable(skeletonData) {
     return drawable;
 }
 
+// Nama bone yang mau "dikunci" ke posisi setup pose (rest position) tiap frame,
+// buat nutup keyframe translate yang rusak/nyasar tanpa perlu edit file sumber.
+// Contoh: LOCK_BONE_TRANSLATE=Root  atau  LOCK_BONE_TRANSLATE=Root,BoneLain
+const LOCK_BONES = (process.env.LOCK_BONE_TRANSLATE || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+function lockBones(skeleton) {
+    if (LOCK_BONES.length === 0) return;
+    for (const name of LOCK_BONES) {
+        const bone = skeleton.findBone(name);
+        if (!bone) {
+            console.warn(`Catatan: LOCK_BONE_TRANSLATE "${name}" tidak ditemukan di skeleton ini.`);
+            continue;
+        }
+        // balikin ke posisi setup pose (rest), abaikan keyframe translate apapun
+        // yang di-set animasi untuk bone ini di frame sekarang.
+        bone.x = bone.data.x;
+        bone.y = bone.data.y;
+    }
+}
+
 function resetAndStart(drawable, animationName, loop = false) {
     const skeleton = drawable.skeleton;
     const state = drawable.animationState;
@@ -149,6 +166,7 @@ function resetAndStart(drawable, animationName, loop = false) {
     state.clearTracks();
     state.setAnimation(0, animationName, loop);
     state.apply(skeleton);
+    lockBones(skeleton);
     skeleton.updateWorldTransform(Physics.update);
 }
 
@@ -161,6 +179,7 @@ function step(drawable, delta) {
     state.update(delta);
     skeleton.update(delta);
     state.apply(skeleton);
+    lockBones(skeleton);
     skeleton.updateWorldTransform(Physics.update);
 }
 
@@ -227,47 +246,13 @@ function makeSequence(skeletonData) {
         }
     }
 
-    // --------------------------------------------------------
-    // Segmen ke-3 (opsional). EXTRA_NAME kosong (default) -> blok
-    // ini dilewati sepenuhnya, tidak ada findAnimation() dipanggil,
-    // tidak ada efek apapun ke hasil render.
-    // Kalau diisi, animasi ini diputar SEKALI setelah idle selesai
-    // (atau setelah action kalau idle tidak dipakai/tidak ketemu).
-    // --------------------------------------------------------
-    let extra = null;
-    if (EXTRA_NAME) {
-        extra = skeletonData.findAnimation(EXTRA_NAME);
-        if (extra && (extra.name === action.name || (hasIdle && extra.name === idle.name))) {
-            extra = null; // jangan pakai animasi yang sama 2x
-        }
-        if (!extra) {
-            console.log(`Catatan: EXTRA_NAME "${EXTRA_NAME}" tidak ditemukan di file ini (atau duplikat) - segmen ke-3 dilewati.`);
-        }
-    }
-    const hasExtra = !!extra;
-
-    let extraDuration = hasExtra ? extra.duration : 0;
-    if (hasExtra && process.env.EXTRA_DURATION !== undefined && process.env.EXTRA_DURATION !== "") {
-        const override = Number(process.env.EXTRA_DURATION);
-        if (Number.isFinite(override) && override >= 0) {
-            extraDuration = override;
-            const loopCount = extra.duration > 0 ? (override / extra.duration).toFixed(2) : "0";
-            console.log(`Catatan: EXTRA_DURATION di-set ${override}s (native "${extra.name}" = ${extra.duration.toFixed(3)}s, di-loop ~${loopCount}x).`);
-        } else {
-            console.log(`Catatan: EXTRA_DURATION "${process.env.EXTRA_DURATION}" tidak valid, pakai durasi native extra.`);
-        }
-    }
-
     return {
         action,
         idle: hasIdle ? idle : null,
         hasIdle,
-        extra: hasExtra ? extra : null,
-        hasExtra,
         actionDuration: action.duration,
         idleDuration,
-        extraDuration,
-        totalDuration: action.duration + idleDuration + extraDuration
+        totalDuration: action.duration + idleDuration
     };
 }
 
@@ -279,37 +264,20 @@ function totalFramesFor(duration) {
 
 function createSequenceSimulator(skeletonData, sequence) {
     const drawable = createDrawable(skeletonData);
-
-    // Daftar segmen berurutan: action (wajib, sekali, no-loop),
-    // lalu idle (opsional), lalu extra (opsional, cuma ada kalau
-    // EXTRA_NAME diisi dan ketemu). Kalau idle/extra tidak ada,
-    // array ini otomatis lebih pendek - tidak ada perubahan
-    // perilaku dibanding sebelum fitur "extra" ditambahkan.
-    const segments = [
-        { name: sequence.action.name, duration: sequence.actionDuration, loop: false }
-    ];
-    if (sequence.hasIdle) {
-        segments.push({ name: sequence.idle.name, duration: sequence.idleDuration, loop: true });
-    }
-    if (sequence.hasExtra) {
-        segments.push({ name: sequence.extra.name, duration: sequence.extraDuration, loop: true });
-    }
-
-    let cursor = 0;
-    for (const seg of segments) {
-        seg.startTime = cursor;
-        cursor += seg.duration;
-        seg.endTime = cursor;
-    }
-
-    resetAndStart(drawable, segments[0].name, segments[0].loop);
+    resetAndStart(drawable, sequence.action.name, false);
 
     let currentTime = 0;
-    let activeIndex = 0;
+    let idleStarted = false;
 
-    function activateSegment(index) {
-        activeIndex = index;
-        drawable.animationState.setAnimation(0, segments[index].name, segments[index].loop);
+    function switchToIdle() {
+        if (idleStarted) return;
+        idleStarted = true;
+        if (sequence.hasIdle) {
+            drawable.animationState.setAnimation(0, sequence.idle.name, true);
+        }
+        // Kalau tidak ada animasi idle, biarkan pose terakhir dari action
+        // tetap dipakai (idleDuration = 0 jadi bagian ini nyaris tidak pernah
+        // benar-benar dipakai untuk merender frame tambahan).
     }
 
     function advanceTo(targetTime) {
@@ -320,26 +288,25 @@ function createSequenceSimulator(skeletonData, sequence) {
         const EPS = 1e-10;
 
         while (currentTime + EPS < targetTime) {
-            const seg = segments[activeIndex];
-
-            if (currentTime < seg.endTime - EPS) {
-                const next = Math.min(targetTime, seg.endTime);
+            if (!idleStarted && currentTime < sequence.actionDuration - EPS) {
+                const next = Math.min(targetTime, sequence.actionDuration);
                 step(drawable, next - currentTime);
                 currentTime = next;
 
-                if (currentTime >= seg.endTime - EPS && activeIndex < segments.length - 1) {
-                    currentTime = seg.endTime;
-                    activateSegment(activeIndex + 1);
+                if (currentTime >= sequence.actionDuration - EPS) {
+                    currentTime = sequence.actionDuration;
+                    switchToIdle();
                 }
-            } else if (activeIndex < segments.length - 1) {
-                activateSegment(activeIndex + 1);
             } else {
-                // Segmen terakhir sudah aktif dan durasinya sudah lewat
-                // (mis. tidak ada idle/extra sama sekali) - tetap step
-                // supaya pose terakhir "freeze", sama seperti sebelumnya.
+                if (!idleStarted) switchToIdle();
                 step(drawable, targetTime - currentTime);
                 currentTime = targetTime;
             }
+        }
+
+        if (!idleStarted && targetTime >= sequence.actionDuration - EPS) {
+            currentTime = sequence.actionDuration;
+            switchToIdle();
         }
     }
 
@@ -515,16 +482,12 @@ function loadSequenceInfo(skeletonData) {
 
     console.log(`Action : ${sequence.actionDuration.toFixed(6)} sec`);
     console.log(`Idle   : ${sequence.idleDuration.toFixed(6)} sec`);
-    if (sequence.hasExtra) {
-        console.log(`Extra  : ${sequence.extraDuration.toFixed(6)} sec (animasi: "${sequence.extra.name}")`);
-    }
     console.log(`Total  : ${sequence.totalDuration.toFixed(6)} sec`);
     console.log(`FPS    : ${FPS}`);
 
     const actionFrames = totalFramesFor(sequence.actionDuration);
     const idleFrames = totalFramesFor(sequence.idleDuration);
-    const extraFrames = sequence.hasExtra ? totalFramesFor(sequence.extraDuration) : 0;
-    const totalFrames = Math.max(1, actionFrames + idleFrames + extraFrames);
+    const totalFrames = Math.max(1, actionFrames + idleFrames);
 
     console.log(`Frames : ${totalFrames}`);
 
@@ -725,11 +688,6 @@ async function runSingleMode() {
     console.log(sequence.idleDuration !== (sequence.idle ? sequence.idle.duration : 0)
         ? `Idle  : durasi di-override (loop otomatis kalau lebih panjang dari animasi asli)`
         : "Idle  : original duration, once (NO LOOP)");
-    if (sequence.hasExtra) {
-        console.log(sequence.extraDuration !== sequence.extra.duration
-            ? `Extra : durasi di-override (loop otomatis), animasi: "${sequence.extra.name}"`
-            : `Extra : original duration, once, animasi: "${sequence.extra.name}"`);
-    }
     console.log("Scale : 1:1");
     console.log("========================================");
 }
