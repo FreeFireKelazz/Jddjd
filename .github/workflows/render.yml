@@ -63,6 +63,10 @@ on:
         description: "'dynamic' = scan semua frame, tidak pernah kepotong (default). 'game' = pakai bounds statis dari skeleton.json, persis kayak game asli (lebih cepat, bisa kepotong kalau pose keluar kotak)."
         required: false
         default: "dynamic"
+      lock_bone_translate:
+        description: "Nama bone yang translate-nya mau dikunci ke setup pose (rest position), pisahkan koma kalau lebih dari satu. Contoh: Root  atau  Root,BoneLain. Kosongkan kalau tidak perlu."
+        required: false
+        default: ""
 
 jobs:
   bounds:
@@ -103,6 +107,7 @@ jobs:
           EXTRA_DURATION: ${{ github.event.inputs.extra_duration }}
           FPS: ${{ github.event.inputs.fps }}
           BOUNDS: ${{ github.event.inputs.bounds_mode }}
+          LOCK_BONE_TRANSLATE: ${{ github.event.inputs.lock_bone_translate }}
         run: node render_mp4.js
       - name: Generate thumbnail (frame pertama, crop presisi)
         working-directory: spine_renderer
@@ -116,6 +121,7 @@ jobs:
           IDLE_DURATION: ${{ github.event.inputs.idle_duration }}
           EXTRA: ${{ github.event.inputs.extra_name }}
           EXTRA_DURATION: ${{ github.event.inputs.extra_duration }}
+          LOCK_BONE_TRANSLATE: ${{ github.event.inputs.lock_bone_translate }}
         run: node render_mp4.js
       - uses: actions/upload-artifact@v4
         with:
@@ -196,6 +202,7 @@ jobs:
           FPS: ${{ github.event.inputs.fps }}
           ALPHA: ${{ github.event.inputs.format == 'webm' && '1' || '0' }}
           CHROMA_COLOR: ${{ github.event.inputs.format == 'chromakey' && github.event.inputs.chroma_color || '' }}
+          LOCK_BONE_TRANSLATE: ${{ github.event.inputs.lock_bone_translate }}
         run: node render_mp4.js
       - uses: actions/upload-artifact@v4
         if: ${{ matrix.shard < fromJSON(github.event.inputs.shards) }}
