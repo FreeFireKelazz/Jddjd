@@ -130,6 +130,13 @@ function createDrawable(skeletonData) {
     return drawable;
 }
 
+// BOUNDS menentukan cara canvas/frame render dihitung:
+//   dynamic (default) -> perilaku lama: scan semua frame Action+Idle,
+//                         union bounds + pixel-perfect crop.
+//   game               -> pakai bounds STATIS dari skeleton.json
+//                          (x/y/width/height), persis seperti game asli.
+const BOUNDS_SOURCE = (process.env.BOUNDS || "dynamic").toLowerCase();
+
 // Nama bone yang mau "dikunci" ke posisi setup pose (rest position) tiap frame,
 // buat nutup keyframe translate yang rusak/nyasar tanpa perlu edit file sumber.
 // Contoh: LOCK_BONE_TRANSLATE=Root  atau  LOCK_BONE_TRANSLATE=Root,BoneLain
@@ -494,7 +501,29 @@ function loadSequenceInfo(skeletonData) {
     return { sequence, totalFrames };
 }
 
+function computeGameBounds(skeletonData) {
+    const width = Math.max(1, Math.ceil(skeletonData.width));
+    const height = Math.max(1, Math.ceil(skeletonData.height));
+    const originX = skeletonData.x;
+    const originY = skeletonData.y;
+
+    console.log("========================================");
+    console.log("BOUNDS MODE: game (statis, dari skeleton.json)");
+    console.log(`skeleton.x=${originX}, y=${originY}`);
+    console.log(`skeleton.width=${skeletonData.width}, height=${skeletonData.height}`);
+    console.log(`FINAL CANVAS: ${width}x${height}`);
+    console.log(`FINAL ORIGIN: (${originX}, ${originY})`);
+    console.log("Catatan: bounds statis, tidak di-scan ulang per frame.");
+    console.log("========================================");
+
+    return makeEvenDimensions({ width, height, originX, originY, cropX: 0, cropY: 0 });
+}
+
 async function computeFinalBounds(ck, skeletonData, sequence, totalFrames, renderer) {
+    if (BOUNDS_SOURCE === "game") {
+        return computeGameBounds(skeletonData);
+    }
+
     console.log("[3/7] Scanning Spine world bounds: Action + Idle...");
 
     const worldUnion = newUnion();
