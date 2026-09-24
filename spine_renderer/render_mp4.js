@@ -440,6 +440,29 @@ function decodePng(pngBytes) {
     return decoded.data;
 }
 
+// Ambil raw RGBA langsung dari SkImage tanpa lewat PNG encode+decode.
+// Dipakai di loop bounds scan (pass 2) yang cuma butuh baca channel alpha
+// tiap pixel - encode ke PNG (compress) lalu decode lagi (decompress) itu
+// kerjaan CPU yang sama sekali gak perlu buat kebutuhan ini.
+function snapshotPixels(ck, surface, width, height) {
+    const image = surface.makeImageSnapshot();
+    if (!image) throw new Error("CanvasKit makeImageSnapshot() gagal.");
+
+    try {
+        const pixels = image.readPixels(0, 0, {
+            width,
+            height,
+            alphaType: ck.AlphaType.Unpremul,
+            colorType: ck.ColorType.RGBA_8888,
+            colorSpace: ck.ColorSpace.SRGB,
+        });
+        if (!pixels) throw new Error("CanvasKit readPixels() gagal.");
+        return pixels;
+    } finally {
+        if (typeof image.delete === "function") image.delete();
+    }
+}
+
 function unionVisiblePixels(union, pixels, width, height) {
     for (let y = 0; y < height; y++) {
         const row = y * width * 4;
@@ -606,8 +629,7 @@ async function computeFinalBounds(ck, skeletonData, sequence, totalFrames, rende
         positionAndRender(ck, renderer, smallCanvas, sim2.drawable, safe.minX, safe.minY, ck.TRANSPARENT);
         smallCanvas.restore();
 
-        const pngBytes = snapshotToPng(ck, smallSurface);
-        const pixels = decodePng(pngBytes);
+        const pixels = snapshotPixels(ck, smallSurface, smallW, smallH);
         unionVisiblePixels(smallUnion, pixels, smallW, smallH);
         printProgress(i + 1, totalFrames, t2start);
     }

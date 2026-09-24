@@ -232,8 +232,14 @@ jobs:
           merge-multiple: true
       - name: Encode MP4
         run: |
+          RENDER_MAX_DIM="${{ github.event.inputs.render_max_dim }}"
           SCALE="${{ github.event.inputs.scale_percent }}"
           MAXDIM="${{ github.event.inputs.max_dimension }}"
+          if [ -n "$RENDER_MAX_DIM" ]; then
+            echo "render_max_dim aktif ($RENDER_MAX_DIM) - frame sudah di-render di resolusi ini, skip scale_percent/max_dimension biar gak numpuk downscale lagi."
+            SCALE=""
+            MAXDIM=""
+          fi
           FILTER=""
           if [ -n "$MAXDIM" ]; then
             # Sisi TERPENDEK (lebar ATAU tinggi, mana yang lebih kecil) dipatok
