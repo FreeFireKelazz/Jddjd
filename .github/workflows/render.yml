@@ -73,10 +73,11 @@ on:
         default: ""
 
 jobs:
-  bounds:
+  bounds_pass1:
     runs-on: ubuntu-latest
     outputs:
-      total_frames: ${{ steps.read_bounds.outputs.total_frames }}
+      total_frames: ${{ steps.read_pass1.outputs.total_frames }}
+      pass1_mode: ${{ steps.read_pass1.outputs.pass1_mode }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -97,12 +98,12 @@ jobs:
           DIR=$(dirname "$FOUND")
           echo "path=${{ github.workspace }}/spine_renderer/$(basename "$DIR")" >> "$GITHUB_OUTPUT"
           echo "Asset folder terdeteksi: $DIR"
-      - name: Hitung bounds
+      - name: Pass 1 - scan vector bounds (murah, tidak di-shard)
         working-directory: spine_renderer
         env:
-          MODE: bounds
+          MODE: bounds-pass1
           ASSET: ${{ steps.asset.outputs.path }}
-          BOUNDS_FILE: ${{ github.workspace }}/spine_renderer/output/bounds.json
+          PASS1_FILE: ${{ github.workspace }}/spine_renderer/output/bounds_pass1.json
           ACTION: ${{ github.event.inputs.action_name }}
           ACTION_DURATION: ${{ github.event.inputs.action_duration }}
           IDLE: ${{ github.event.inputs.idle_name }}
@@ -114,6 +115,37 @@ jobs:
           LOCK_BONE_TRANSLATE: ${{ github.event.inputs.lock_bone_translate }}
           RENDER_MAX_DIM: ${{ github.event.inputs.render_max_dim }}
         run: node render_mp4.js
+      - id: read_pass1
+        run: |
+          echo "total_frames=$(node -pe 'JSON.parse(require("fs").readFileSync("spine_renderer/output/bounds_pass1.json")).totalFrames')" >> "$GITHUB_OUTPUT"
+          echo "pass1_mode=$(node -pe 'JSON.parse(require("fs").readFileSync("spine_renderer/output/bounds_pass1.json")).mode')" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bounds-pass1-data
+          path: spine_renderer/output/bounds_pass1.json
+          retention-days: 1
+
+  thumbnail:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        working-directory: spine_renderer
+        run: npm install
+      - name: Deteksi folder asset (cari *.atlas)
+        id: asset
+        working-directory: spine_renderer
+        run: |
+          FOUND=$(find . -maxdepth 2 -iname "*.atlas" -not -path "./node_modules/*" -not -path "./output/*" | head -n1)
+          if [ -z "$FOUND" ]; then
+            echo "Tidak ada file .atlas ditemukan di dalam spine_renderer/*" >&2
+            exit 1
+          fi
+          DIR=$(dirname "$FOUND")
+          echo "path=${{ github.workspace }}/spine_renderer/$(basename "$DIR")" >> "$GITHUB_OUTPUT"
       - name: Generate thumbnail (frame pertama, crop presisi)
         working-directory: spine_renderer
         env:
@@ -138,8 +170,118 @@ jobs:
             spine_renderer/output/thumbnail_last.png
           if-no-files-found: error
           retention-days: 90
-      - id: read_bounds
-        run: echo "total_frames=$(node -pe 'JSON.parse(require("fs").readFileSync("spine_renderer/output/bounds.json")).totalFrames')" >> "$GITHUB_OUTPUT"
+
+  bounds_shard:
+    needs: bounds_pass1
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        working-directory: spine_renderer
+        run: npm install
+      - uses: actions/download-artifact@v4
+        with:
+          name: bounds-pass1-data
+          path: spine_renderer/output
+      - name: Deteksi folder asset (cari *.atlas)
+        id: asset
+        working-directory: spine_renderer
+        run: |
+          FOUND=$(find . -maxdepth 2 -iname "*.atlas" -not -path "./node_modules/*" -not -path "./output/*" | head -n1)
+          if [ -z "$FOUND" ]; then
+            echo "Tidak ada file .atlas ditemukan di dalam spine_renderer/*" >&2
+            exit 1
+          fi
+          DIR=$(dirname "$FOUND")
+          echo "path=${{ github.workspace }}/spine_renderer/$(basename "$DIR")" >> "$GITHUB_OUTPUT"
+      - name: Hitung frame range untuk shard ini
+        id: range
+        run: |
+          node -e '
+            const total = ${{ needs.bounds_pass1.outputs.total_frames }};
+            const shardCount = ${{ github.event.inputs.shards }};
+            const k = ${{ matrix.shard }};
+            if (k >= shardCount) { console.log("start=0"); console.log("end=0"); process.exit(0); }
+            const start = Math.floor((k * total) / shardCount);
+            const end = Math.floor(((k + 1) * total) / shardCount);
+            console.log("start=" + start);
+            console.log("end=" + end);
+          ' >> "$GITHUB_OUTPUT"
+      - name: Scan pixel-perfect bounds untuk frame range ini
+        if: ${{ matrix.shard < fromJSON(github.event.inputs.shards) }}
+        working-directory: spine_renderer
+        env:
+          MODE: bounds-shard
+          ASSET: ${{ steps.asset.outputs.path }}
+          PASS1_FILE: ${{ github.workspace }}/spine_renderer/output/bounds_pass1.json
+          SHARD_FILE: ${{ github.workspace }}/spine_renderer/output/bounds_shard_${{ matrix.shard }}.json
+          SHARD_START: ${{ steps.range.outputs.start }}
+          SHARD_END: ${{ steps.range.outputs.end }}
+          ACTION: ${{ github.event.inputs.action_name }}
+          ACTION_DURATION: ${{ github.event.inputs.action_duration }}
+          IDLE: ${{ github.event.inputs.idle_name }}
+          IDLE_DURATION: ${{ github.event.inputs.idle_duration }}
+          EXTRA: ${{ github.event.inputs.extra_name }}
+          EXTRA_DURATION: ${{ github.event.inputs.extra_duration }}
+          FPS: ${{ github.event.inputs.fps }}
+          LOCK_BONE_TRANSLATE: ${{ github.event.inputs.lock_bone_translate }}
+        run: node render_mp4.js
+      - uses: actions/upload-artifact@v4
+        if: ${{ matrix.shard < fromJSON(github.event.inputs.shards) }}
+        with:
+          name: bounds-shard-${{ matrix.shard }}-data
+          path: spine_renderer/output/bounds_shard_${{ matrix.shard }}.json
+          retention-days: 1
+
+  bounds_merge:
+    needs: [bounds_pass1, bounds_shard]
+    runs-on: ubuntu-latest
+    outputs:
+      total_frames: ${{ needs.bounds_pass1.outputs.total_frames }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        working-directory: spine_renderer
+        run: npm install
+      - uses: actions/download-artifact@v4
+        with:
+          name: bounds-pass1-data
+          path: spine_renderer/output
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: bounds-shard-*-data
+          path: spine_renderer/output/bounds_shards
+          merge-multiple: true
+      - name: Deteksi folder asset (cari *.atlas)
+        id: asset
+        working-directory: spine_renderer
+        run: |
+          FOUND=$(find . -maxdepth 2 -iname "*.atlas" -not -path "./node_modules/*" -not -path "./output/*" | head -n1)
+          if [ -z "$FOUND" ]; then
+            echo "Tidak ada file .atlas ditemukan di dalam spine_renderer/*" >&2
+            exit 1
+          fi
+          DIR=$(dirname "$FOUND")
+          echo "path=${{ github.workspace }}/spine_renderer/$(basename "$DIR")" >> "$GITHUB_OUTPUT"
+      - name: Gabungkan semua shard jadi bounds final
+        working-directory: spine_renderer
+        env:
+          MODE: bounds-merge
+          ASSET: ${{ steps.asset.outputs.path }}
+          PASS1_FILE: ${{ github.workspace }}/spine_renderer/output/bounds_pass1.json
+          SHARDS_DIR: ${{ github.workspace }}/spine_renderer/output/bounds_shards
+          BOUNDS_FILE: ${{ github.workspace }}/spine_renderer/output/bounds.json
+          RENDER_MAX_DIM: ${{ github.event.inputs.render_max_dim }}
+        run: node render_mp4.js
       - uses: actions/upload-artifact@v4
         with:
           name: bounds-data
@@ -147,7 +289,7 @@ jobs:
           retention-days: 1
 
   frames:
-    needs: bounds
+    needs: bounds_merge
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -179,7 +321,7 @@ jobs:
         id: range
         run: |
           node -e '
-            const total = ${{ needs.bounds.outputs.total_frames }};
+            const total = ${{ needs.bounds_merge.outputs.total_frames }};
             const shardCount = ${{ github.event.inputs.shards }};
             const k = ${{ matrix.shard }};
             if (k >= shardCount) { console.log("start=0"); console.log("end=0"); process.exit(0); }
@@ -217,7 +359,7 @@ jobs:
           retention-days: 1
 
   encode:
-    needs: [bounds, frames]
+    needs: [bounds_merge, frames]
     runs-on: ubuntu-latest
     permissions:
       actions: write
@@ -232,9 +374,9 @@ jobs:
           merge-multiple: true
       - name: Encode MP4
         run: |
-          RENDER_MAX_DIM="${{ github.event.inputs.render_max_dim }}"
           SCALE="${{ github.event.inputs.scale_percent }}"
           MAXDIM="${{ github.event.inputs.max_dimension }}"
+          RENDER_MAX_DIM="${{ github.event.inputs.render_max_dim }}"
           if [ -n "$RENDER_MAX_DIM" ]; then
             echo "render_max_dim aktif ($RENDER_MAX_DIM) - frame sudah di-render di resolusi ini, skip scale_percent/max_dimension biar gak numpuk downscale lagi."
             SCALE=""
@@ -292,13 +434,13 @@ jobs:
           name: rendered-video
           path: ${{ env.OUTFILE }}
           retention-days: 90
-      - name: Hapus artifact sementara (frames-shard-* & bounds-data)
+      - name: Hapus artifact sementara (frames-shard-*, bounds-data, bounds-pass1-data, bounds-shard-*-data)
         if: success()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" \
-            --jq '.artifacts[] | select(.name | test("^frames-shard-|^bounds-data$")) | .id' \
+            --jq '.artifacts[] | select(.name | test("^frames-shard-|^bounds-data$|^bounds-pass1-data$|^bounds-shard-.*-data$")) | .id' \
           | while read -r id; do
               echo "Menghapus artifact id=$id ..."
               gh api -X DELETE "repos/${{ github.repository }}/actions/artifacts/$id" || true

@@ -87,6 +87,25 @@ const FRAME_END = Number(process.env.FRAME_END || 0);
 const FRAMES_OUT = process.env.FRAMES_OUT || path.join(ROOT, "frames");
 const THUMBNAIL_OUT = process.env.THUMBNAIL_OUT || path.join(ROOT, `${SPINE_FILES.baseName}_thumbnail.png`);
 
+// --------------------------------------------------------
+// 3 mode tambahan buat sharding bounds scan (pass 2) ke beberapa
+// job GitHub Actions paralel:
+//   bounds-pass1 -> scan vector (murah) semua frame, hasilnya "safe"
+//                   canvas + (kalau BOUNDS=game) langsung finalBounds.
+//                   Ditulis ke PASS1_FILE.
+//   bounds-shard -> baca PASS1_FILE, scan pixel-perfect (mahal) HANYA
+//                   utk frame SHARD_START..SHARD_END, hasil partial
+//                   union ditulis ke SHARD_FILE.
+//   bounds-merge -> baca PASS1_FILE + semua file di SHARDS_DIR,
+//                   gabung jadi 1 union, lanjut proses sama seperti
+//                   bounds mode lama, tulis BOUNDS_FILE final.
+// --------------------------------------------------------
+const PASS1_FILE = process.env.PASS1_FILE || path.join(ROOT, "bounds_pass1.json");
+const SHARD_FILE = process.env.SHARD_FILE || path.join(ROOT, "bounds_shard.json");
+const SHARDS_DIR = process.env.SHARDS_DIR || path.join(ROOT, "bounds_shards");
+const SHARD_START = Number(process.env.SHARD_START || 0);
+const SHARD_END = Number(process.env.SHARD_END || 0);
+
 function readFile(file) {
     return fs.readFileSync(file);
 }
@@ -406,6 +425,31 @@ function positionAndRender(ck, renderer, canvas, drawable, originX, originY, cle
 }
 
 function snapshotToPng(ck, surface) {
+    // CanvasKit encodeToBytes() ternyata nyimpen buffer RGB apa adanya
+    // (premultiplied) tanpa di-unpremultiply dulu ke PNG - hasilnya pixel
+    // semi-transparent (mis. tepi halo/glow yang lembut) punya RGB yang
+    // udah "digelapin" ke arah hitam sebanding alpha-nya, bukan warna
+    // aslinya. Ini nyaris tidak kelihatan di sprite karakter biasa (area
+    // semi-transparent-nya cuma tepi AA tipis), tapi SANGAT kelihatan di
+    // texture yang isinya mayoritas gradient halus (halo/glow/light),
+    // muncul sebagai "hitam-hitam" di area yang harusnya cuma pudar.
+    // Fix: baca pixel mentah dengan alphaType Unpremul secara eksplisit
+    // (warna asli sudah "dibagi balik" oleh alpha-nya), baru encode PNG
+    // manual lewat pngjs - hasilnya straight alpha yang benar.
+    try {
+        const width = surface.width();
+        const height = surface.height();
+        const pixels = snapshotPixels(ck, surface, width, height);
+        const png = new PNG({ width, height });
+        png.data = Buffer.from(pixels.buffer, pixels.byteOffset, pixels.byteLength);
+        return PNG.sync.write(png);
+    } catch (err) {
+        if (!snapshotToPng._warned) {
+            console.warn(`Catatan: PNG encode via unpremultiply gagal (${err.message}), fallback ke CanvasKit encodeToBytes() (berisiko RGB premultiplied di area semi-transparent).`);
+            snapshotToPng._warned = true;
+        }
+    }
+
     const image = surface.makeImageSnapshot();
     if (!image) throw new Error("CanvasKit makeImageSnapshot() gagal.");
 
@@ -655,6 +699,178 @@ async function computeFinalBounds(ck, skeletonData, sequence, totalFrames, rende
     return finalBounds;
 }
 
+async function runBoundsPass1Mode() {
+    fs.mkdirSync(path.dirname(PASS1_FILE), { recursive: true });
+
+    const ck = await CanvasKitInit();
+    console.log("[1/7] Loading CanvasKit...");
+    console.log("[2/7] Loading atlas + skeleton...");
+    const atlas = await loadTextureAtlas(ck, ATLAS, readFile);
+    const skeletonData = await loadSkeletonData(JSON_FILE, atlas, readFile);
+    const { sequence, totalFrames } = loadSequenceInfo(skeletonData);
+
+    if (BOUNDS_SOURCE === "game") {
+        const finalBounds = applyRenderScale(computeGameBounds(skeletonData));
+        fs.writeFileSync(PASS1_FILE, JSON.stringify({
+            mode: "game",
+            finalBounds,
+            totalFrames,
+            fps: FPS
+        }, null, 2));
+        console.log(`Pass1 (mode game, tidak perlu shard) ditulis ke ${PASS1_FILE}`);
+        return;
+    }
+
+    console.log("[3/7] Scanning Spine world bounds (vector, murah): Action + Idle...");
+    const sim = createSequenceSimulator(skeletonData, sequence);
+    const worldUnion = newUnion();
+    const t0 = Date.now();
+
+    for (let i = 0; i < totalFrames; i++) {
+        sim.advanceTo(i / FPS);
+        updateUnion(worldUnion, getBounds(sim.drawable.skeleton));
+        printProgress(i + 1, totalFrames, t0);
+    }
+
+    const safe = makeSafeCanvasSize(worldUnion);
+    console.log(`Safe world canvas: ${safe.width}x${safe.height}`);
+    console.log(`World min: (${worldUnion.minX.toFixed(3)}, ${worldUnion.minY.toFixed(3)})`);
+    console.log(`World max: (${worldUnion.maxX.toFixed(3)}, ${worldUnion.maxY.toFixed(3)})`);
+
+    fs.writeFileSync(PASS1_FILE, JSON.stringify({
+        mode: "dynamic",
+        safe,
+        totalFrames,
+        fps: FPS
+    }, null, 2));
+    console.log(`Pass1 ditulis ke ${PASS1_FILE}`);
+}
+
+async function runBoundsShardMode() {
+    const pass1 = JSON.parse(fs.readFileSync(PASS1_FILE, "utf8"));
+
+    fs.mkdirSync(path.dirname(SHARD_FILE), { recursive: true });
+
+    if (pass1.mode === "game") {
+        // Mode game tidak butuh pixel scan sama sekali - tulis union kosong
+        // (sentinel) biar shard ini selesai secepat mungkin, bounds-merge
+        // bakal skip pemakaiannya karena baca finalBounds langsung dari pass1.
+        fs.writeFileSync(SHARD_FILE, JSON.stringify(newUnion(), null, 2));
+        console.log("Pass1 mode=game, shard ini skip (tidak ada yang perlu di-scan).");
+        return;
+    }
+
+    if (SHARD_END <= SHARD_START) {
+        fs.writeFileSync(SHARD_FILE, JSON.stringify(newUnion(), null, 2));
+        console.log(`Shard kosong (SHARD_START=${SHARD_START} >= SHARD_END=${SHARD_END}), skip.`);
+        return;
+    }
+
+    const ck = await CanvasKitInit();
+    console.log("[1/7] Loading CanvasKit...");
+    console.log("[2/7] Loading atlas + skeleton...");
+    const atlas = await loadTextureAtlas(ck, ATLAS, readFile);
+    const skeletonData = await loadSkeletonData(JSON_FILE, atlas, readFile);
+    const { sequence } = loadSequenceInfo(skeletonData);
+    const renderer = new SkeletonRenderer(ck);
+
+    const safe = pass1.safe;
+    const DOWNSCALE = Number(process.env.BOUNDS_DOWNSCALE || 4);
+    const smallW = Math.max(1, Math.ceil(safe.width / DOWNSCALE));
+    const smallH = Math.max(1, Math.ceil(safe.height / DOWNSCALE));
+
+    const smallSurface = ck.MakeSurface(smallW, smallH);
+    if (!smallSurface) throw new Error(`CanvasKit gagal membuat surface kecil ${smallW}x${smallH}`);
+    const smallCanvas = smallSurface.getCanvas();
+    const smallUnion = newUnion();
+    const sim = createSequenceSimulator(skeletonData, sequence);
+
+    // Simulator cuma bisa maju waktu (advanceTo), jadi warm-up dari frame 0
+    // sampai SHARD_START DULU (tanpa render/scan) baru mulai kerja beneran.
+    console.log(`  Warm-up 0..${SHARD_START} (tanpa render/scan)...`);
+    for (let i = 0; i < SHARD_START; i++) {
+        sim.advanceTo(i / FPS);
+    }
+
+    console.log(`  Scanning pixel-perfect frame ${SHARD_START}..${SHARD_END}...`);
+    const t0 = Date.now();
+    const shardTotal = SHARD_END - SHARD_START;
+
+    for (let i = SHARD_START; i < SHARD_END; i++) {
+        const t = i / FPS;
+        sim.advanceTo(t);
+
+        smallCanvas.save();
+        smallCanvas.scale(1 / DOWNSCALE, 1 / DOWNSCALE);
+        positionAndRender(ck, renderer, smallCanvas, sim.drawable, safe.minX, safe.minY, ck.TRANSPARENT);
+        smallCanvas.restore();
+
+        const pixels = snapshotPixels(ck, smallSurface, smallW, smallH);
+        unionVisiblePixels(smallUnion, pixels, smallW, smallH);
+        printProgress(i - SHARD_START + 1, shardTotal, t0);
+    }
+
+    if (typeof smallSurface.delete === "function") smallSurface.delete();
+
+    fs.writeFileSync(SHARD_FILE, JSON.stringify(smallUnion, null, 2));
+    console.log(`Shard ${SHARD_START}..${SHARD_END} selesai, union ditulis ke ${SHARD_FILE}`);
+}
+
+async function runBoundsMergeMode() {
+    fs.mkdirSync(path.dirname(BOUNDS_FILE), { recursive: true });
+
+    const pass1 = JSON.parse(fs.readFileSync(PASS1_FILE, "utf8"));
+
+    if (pass1.mode === "game") {
+        fs.writeFileSync(BOUNDS_FILE, JSON.stringify({
+            finalBounds: pass1.finalBounds,
+            totalFrames: pass1.totalFrames,
+            fps: pass1.fps
+        }, null, 2));
+        console.log("Mode game: finalBounds dari pass1 dipakai langsung (tidak ada shard yang perlu digabung).");
+        console.log(`FINAL CANVAS: ${pass1.finalBounds.width}x${pass1.finalBounds.height}`);
+        return;
+    }
+
+    const safe = pass1.safe;
+    const shardFiles = fs.readdirSync(SHARDS_DIR).filter(f => f.endsWith(".json"));
+    if (shardFiles.length === 0) {
+        throw new Error(`Tidak ada file shard ditemukan di ${SHARDS_DIR}`);
+    }
+
+    console.log(`Menggabungkan ${shardFiles.length} shard dari ${SHARDS_DIR}...`);
+    const smallUnion = newUnion();
+    for (const f of shardFiles) {
+        const partial = JSON.parse(fs.readFileSync(path.join(SHARDS_DIR, f), "utf8"));
+        updateUnion(smallUnion, partial);
+    }
+
+    const DOWNSCALE = Number(process.env.BOUNDS_DOWNSCALE || 4);
+    const PAD_EXTRA = Number(process.env.BOUNDS_PADDING || 16);
+
+    const pixelUnion = {
+        minX: Math.max(0, Math.floor(smallUnion.minX * DOWNSCALE) - PAD_EXTRA),
+        minY: Math.max(0, Math.floor(smallUnion.minY * DOWNSCALE) - PAD_EXTRA),
+        maxX: Math.min(safe.width - 1, Math.ceil((smallUnion.maxX + 1) * DOWNSCALE) - 1 + PAD_EXTRA),
+        maxY: Math.min(safe.height - 1, Math.ceil((smallUnion.maxY + 1) * DOWNSCALE) - 1 + PAD_EXTRA)
+    };
+
+    const finalBounds = applyRenderScale(makeEvenDimensions(pixelUnionToFinalBounds(pixelUnion, safe)));
+
+    console.log("========================================");
+    console.log(`FINAL CANVAS: ${finalBounds.width}x${finalBounds.height}`);
+    console.log(`FINAL ORIGIN: (${finalBounds.originX}, ${finalBounds.originY})`);
+    console.log("Crop: none outside global Action+Idle pixel union (digabung dari semua shard)");
+    console.log("========================================");
+
+    fs.writeFileSync(BOUNDS_FILE, JSON.stringify({
+        finalBounds,
+        totalFrames: pass1.totalFrames,
+        fps: pass1.fps
+    }, null, 2));
+    console.log(`Bounds final ditulis ke ${BOUNDS_FILE}`);
+}
+
 async function runBoundsMode() {
     fs.mkdirSync(path.dirname(BOUNDS_FILE), { recursive: true });
 
@@ -807,7 +1023,7 @@ async function renderTightFramePng(ck, renderer, drawable, outPath) {
     positionAndRender(ck, renderer, smallCanvas, drawable, safe.minX, safe.minY, ck.TRANSPARENT);
     smallCanvas.restore();
 
-    const smallPixels = decodePng(snapshotToPng(ck, smallSurface));
+    const smallPixels = snapshotPixels(ck, smallSurface, smallW, smallH);
     const smallUnion = newUnion();
     unionVisiblePixels(smallUnion, smallPixels, smallW, smallH);
     if (typeof smallSurface.delete === "function") smallSurface.delete();
@@ -892,6 +1108,12 @@ async function runThumbnailMode() {
 async function main() {
     if (MODE === "bounds") {
         await runBoundsMode();
+    } else if (MODE === "bounds-pass1") {
+        await runBoundsPass1Mode();
+    } else if (MODE === "bounds-shard") {
+        await runBoundsShardMode();
+    } else if (MODE === "bounds-merge") {
+        await runBoundsMergeMode();
     } else if (MODE === "frames") {
         await runFramesMode();
     } else if (MODE === "thumbnail") {
