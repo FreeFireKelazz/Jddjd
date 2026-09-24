@@ -68,6 +68,8 @@ const PADDING = Number(process.env.PADDING || 2);
 const FFMPEG = process.env.FFMPEG || "ffmpeg";
 const ACTION_NAME = process.env.ACTION || "action";
 const IDLE_NAME = process.env.IDLE || "idle";
+// OPSIONAL: animasi ke-3 yang diputar setelah idle. Kosong = nonaktif total.
+const EXTRA_NAME = (process.env.EXTRA || "").trim();
 
 // --------------------------------------------------------
 // MODE dipakai untuk membagi kerja ke beberapa job GitHub
@@ -106,8 +108,69 @@ const SHARDS_DIR = process.env.SHARDS_DIR || path.join(ROOT, "bounds_shards");
 const SHARD_START = Number(process.env.SHARD_START || 0);
 const SHARD_END = Number(process.env.SHARD_END || 0);
 
+// --------------------------------------------------------
+// FIX PMA (premultiplied alpha):
+// Atlas dengan "pma: true" nyimpen texture PNG yang RGB-nya SUDAH dikali
+// alpha. Tapi CanvasKit/Skia nge-decode PNG sebagai straight alpha lalu
+// dikali alpha LAGI -> area semi-transparan (glow, flare, rainbow, tepi
+// lembut) jadi gelap/menghitam padahal texture aslinya normal.
+// Solusi: sebelum dikasih ke CanvasKit, PNG halaman pma di-unpremultiply
+// dulu (RGB / alpha), jadi hasil premultiply Skia = nilai texture asli.
+// Matikan dengan FIX_PMA=0 kalau perlu.
+// --------------------------------------------------------
+const FIX_PMA = process.env.FIX_PMA !== "0";
+
+function parseAtlasPmaPages(atlasFile) {
+    // Return Map<nama file png (lowercase), boolean pma>
+    const map = new Map();
+    let text;
+    try {
+        text = fs.readFileSync(atlasFile, "utf8");
+    } catch (err) {
+        return map;
+    }
+    for (const block of text.split(/\r?\n\s*\r?\n/)) {
+        const lines = block.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        if (lines.length === 0) continue;
+        const pageName = lines[0];
+        if (!/\.(png|jpg|jpeg|webp)$/i.test(pageName)) continue;
+        const pmaLine = lines.find(l => /^pma\s*:/i.test(l));
+        map.set(pageName.toLowerCase(), !!pmaLine && /true/i.test(pmaLine));
+    }
+    return map;
+}
+
+let PMA_PAGES = null;
+
+function unpremultiplyPng(buf) {
+    const png = PNG.sync.read(buf);
+    const d = png.data;
+    for (let i = 0; i < d.length; i += 4) {
+        const a = d[i + 3];
+        if (a === 0 || a === 255) continue;
+        const k = 255 / a;
+        d[i] = Math.min(255, Math.round(d[i] * k));
+        d[i + 1] = Math.min(255, Math.round(d[i + 1] * k));
+        d[i + 2] = Math.min(255, Math.round(d[i + 2] * k));
+    }
+    return PNG.sync.write(png);
+}
+
 function readFile(file) {
-    return fs.readFileSync(file);
+    const data = fs.readFileSync(file);
+    if (!FIX_PMA || !/\.png$/i.test(file)) return data;
+
+    if (PMA_PAGES === null) PMA_PAGES = parseAtlasPmaPages(ATLAS);
+    if (PMA_PAGES.get(path.basename(file).toLowerCase()) !== true) return data;
+
+    try {
+        const fixed = unpremultiplyPng(data);
+        console.log(`Catatan: ${path.basename(file)} pma:true -> di-unpremultiply biar gak double-premultiply (fix alpha menghitam).`);
+        return fixed;
+    } catch (err) {
+        console.warn(`Peringatan: gagal unpremultiply ${path.basename(file)} (${err.message}), pakai file apa adanya.`);
+        return data;
+    }
 }
 
 // --------------------------------------------------------
@@ -308,13 +371,39 @@ function makeSequence(skeletonData) {
         }
     }
 
+    // ---- Segmen ke-3 (opsional): EXTRA ----
+    let extra = null;
+    let extraDuration = 0;
+    if (EXTRA_NAME) {
+        extra = skeletonData.findAnimation(EXTRA_NAME);
+        if (!extra) {
+            console.log(`Catatan: animation EXTRA "${EXTRA_NAME}" tidak ditemukan, segmen ke-3 dilewati.`);
+        } else {
+            extraDuration = extra.duration;
+            const raw = process.env.EXTRA_DURATION;
+            if (raw !== undefined && raw !== "") {
+                const override = Number(raw);
+                if (Number.isFinite(override) && override >= 0) {
+                    extraDuration = override;
+                    console.log(`Catatan: EXTRA_DURATION di-set ${override}s (native "${extra.name}" = ${extra.duration.toFixed(3)}s).`);
+                } else {
+                    console.log(`Catatan: EXTRA_DURATION "${raw}" tidak valid, pakai durasi native extra.`);
+                }
+            }
+        }
+    }
+    const hasExtra = !!extra;
+
     return {
         action,
         idle: hasIdle ? idle : null,
         hasIdle,
+        extra,
+        hasExtra,
         actionDuration: action.duration,
         idleDuration,
-        totalDuration: action.duration + idleDuration
+        extraDuration,
+        totalDuration: action.duration + idleDuration + extraDuration
     };
 }
 
@@ -329,17 +418,32 @@ function createSequenceSimulator(skeletonData, sequence) {
     resetAndStart(drawable, sequence.action.name, false);
 
     let currentTime = 0;
-    let idleStarted = false;
 
-    function switchToIdle() {
-        if (idleStarted) return;
-        idleStarted = true;
-        if (sequence.hasIdle) {
-            drawable.animationState.setAnimation(0, sequence.idle.name, true);
+    // Titik pergantian animasi (urut waktu): action -> idle -> extra.
+    // Kalau idle tidak ada, action langsung disambung ke extra (kalau ada).
+    // Kalau idle & extra tidak ada, pose terakhir action dipertahankan.
+    const boundaries = [];
+    if (sequence.hasIdle) {
+        boundaries.push({ time: sequence.actionDuration, anim: sequence.idle.name, done: false });
+    }
+    if (sequence.hasExtra) {
+        boundaries.push({
+            time: sequence.actionDuration + sequence.idleDuration,
+            anim: sequence.extra.name,
+            done: false
+        });
+    }
+    if (boundaries.length === 0) {
+        // Tidak ada idle/extra: cukup tandai pergantian di akhir action (no-op).
+        boundaries.push({ time: sequence.actionDuration, anim: null, done: false });
+    }
+
+    function trigger(b) {
+        if (b.done) return;
+        b.done = true;
+        if (b.anim) {
+            drawable.animationState.setAnimation(0, b.anim, true);
         }
-        // Kalau tidak ada animasi idle, biarkan pose terakhir dari action
-        // tetap dipakai (idleDuration = 0 jadi bagian ini nyaris tidak pernah
-        // benar-benar dipakai untuk merender frame tambahan).
     }
 
     function advanceTo(targetTime) {
@@ -350,25 +454,24 @@ function createSequenceSimulator(skeletonData, sequence) {
         const EPS = 1e-10;
 
         while (currentTime + EPS < targetTime) {
-            if (!idleStarted && currentTime < sequence.actionDuration - EPS) {
-                const next = Math.min(targetTime, sequence.actionDuration);
-                step(drawable, next - currentTime);
-                currentTime = next;
+            const nextB = boundaries.find(b => !b.done && b.time > currentTime + EPS);
+            const stopAt = nextB ? Math.min(targetTime, nextB.time) : targetTime;
+            step(drawable, stopAt - currentTime);
+            currentTime = stopAt;
 
-                if (currentTime >= sequence.actionDuration - EPS) {
-                    currentTime = sequence.actionDuration;
-                    switchToIdle();
-                }
-            } else {
-                if (!idleStarted) switchToIdle();
-                step(drawable, targetTime - currentTime);
-                currentTime = targetTime;
+            if (nextB && currentTime >= nextB.time - EPS) {
+                currentTime = nextB.time;
+                trigger(nextB);
             }
         }
 
-        if (!idleStarted && targetTime >= sequence.actionDuration - EPS) {
-            currentTime = sequence.actionDuration;
-            switchToIdle();
+        // Boundary yang persis jatuh di targetTime ikut diaktifkan supaya frame
+        // di t = boundary sudah memakai animasi berikutnya.
+        for (const b of boundaries) {
+            if (!b.done && targetTime >= b.time - EPS) {
+                currentTime = Math.max(currentTime, b.time);
+                trigger(b);
+            }
         }
     }
 
@@ -595,12 +698,16 @@ function loadSequenceInfo(skeletonData) {
 
     console.log(`Action : ${sequence.actionDuration.toFixed(6)} sec`);
     console.log(`Idle   : ${sequence.idleDuration.toFixed(6)} sec`);
+    if (sequence.hasExtra) {
+        console.log(`Extra  : ${sequence.extraDuration.toFixed(6)} sec (${sequence.extra.name})`);
+    }
     console.log(`Total  : ${sequence.totalDuration.toFixed(6)} sec`);
     console.log(`FPS    : ${FPS}`);
 
     const actionFrames = totalFramesFor(sequence.actionDuration);
     const idleFrames = totalFramesFor(sequence.idleDuration);
-    const totalFrames = Math.max(1, actionFrames + idleFrames);
+    const extraFrames = sequence.hasExtra ? totalFramesFor(sequence.extraDuration) : 0;
+    const totalFrames = Math.max(1, actionFrames + idleFrames + extraFrames);
 
     console.log(`Frames : ${totalFrames}`);
 
@@ -994,6 +1101,9 @@ async function runSingleMode() {
     console.log(sequence.idleDuration !== (sequence.idle ? sequence.idle.duration : 0)
         ? `Idle  : durasi di-override (loop otomatis kalau lebih panjang dari animasi asli)`
         : "Idle  : original duration, once (NO LOOP)");
+    if (sequence.hasExtra) {
+        console.log(`Extra : ${sequence.extra.name} (${sequence.extraDuration.toFixed(3)}s) setelah idle`);
+    }
     console.log("Scale : 1:1");
     console.log("========================================");
 }
