@@ -1,0 +1,18 @@
+lucas_summertraining_light.png
+	size: 866, 595
+	filter: Linear, Linear
+	pma: true
+	scale: 0.4
+Maineffect_01
+	bounds: 2, 2, 142, 119
+Maineffect_02
+	bounds: 479, 7, 192, 192
+Maineffect_03
+	bounds: 673, 22, 177, 177
+Maineffect_06
+	bounds: 2, 123, 470, 475
+	offsets: 0, 11, 470, 486
+	rotate: 90
+Rainbow
+	bounds: 479, 201, 385, 392
+	offsets: 6, 3, 394, 397
