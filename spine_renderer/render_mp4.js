@@ -137,6 +137,37 @@ function createDrawable(skeletonData) {
 //                          (x/y/width/height), persis seperti game asli.
 const BOUNDS_SOURCE = (process.env.BOUNDS || "dynamic").toLowerCase();
 
+// --------------------------------------------------------
+// RENDER_MAX_DIM (opsional): kalau di-set, frame di-render LANGSUNG di
+// resolusi ini (sisi terpendek dipatok ke angka ini, proporsional),
+// bukan native lalu di-downscale belakangan di ffmpeg. Bounds/crop area
+// tetap dihitung dari world units yang sama (akurat), cuma jumlah pixel
+// akhirnya yang dikecilkan sejak awal - lebih hemat waktu render & disk
+// kalau target output-nya emang jauh lebih kecil dari native.
+// Tradeoff: ganti RENDER_MAX_DIM = perlu scan bounds ulang (job "Hitung
+// bounds"), karena hasil pixel bergantung skala render-nya.
+// --------------------------------------------------------
+const RENDER_MAX_DIM = Number(process.env.RENDER_MAX_DIM || 0);
+
+function applyRenderScale(finalBounds) {
+    if (!RENDER_MAX_DIM || RENDER_MAX_DIM <= 0) {
+        return { ...finalBounds, renderScale: 1 };
+    }
+    const shortSide = Math.min(finalBounds.width, finalBounds.height);
+    const scale = RENDER_MAX_DIM / shortSide;
+    const width = Math.max(2, Math.round((finalBounds.width * scale) / 2) * 2);
+    const height = Math.max(2, Math.round((finalBounds.height * scale) / 2) * 2);
+
+    console.log("========================================");
+    console.log(`RENDER_MAX_DIM aktif: ${RENDER_MAX_DIM}`);
+    console.log(`Native (world): ${finalBounds.width}x${finalBounds.height}`);
+    console.log(`Render langsung di: ${width}x${height} (scale ${scale.toFixed(6)}x)`);
+    console.log("PNG native TIDAK dibuat - langsung di resolusi ini.");
+    console.log("========================================");
+
+    return { ...finalBounds, width, height, renderScale: scale };
+}
+
 // Nama bone yang mau "dikunci" ke posisi setup pose (rest position) tiap frame,
 // buat nutup keyframe translate yang rusak/nyasar tanpa perlu edit file sumber.
 // Contoh: LOCK_BONE_TRANSLATE=Root  atau  LOCK_BONE_TRANSLATE=Root,BoneLain
@@ -360,7 +391,7 @@ function resolveBgColor(ck) {
     return chroma || ck.BLACK;
 }
 
-function positionAndRender(ck, renderer, canvas, drawable, originX, originY, clearColor) {
+function positionAndRender(ck, renderer, canvas, drawable, originX, originY, clearColor, scale = 1) {
     const skeleton = drawable.skeleton;
 
     skeleton.x = -originX;
@@ -368,7 +399,10 @@ function positionAndRender(ck, renderer, canvas, drawable, originX, originY, cle
     skeleton.updateWorldTransform(Physics.none);
 
     canvas.clear(clearColor);
+    canvas.save();
+    if (scale !== 1) canvas.scale(scale, scale);
     renderer.render(canvas, drawable);
+    canvas.restore();
 }
 
 function snapshotToPng(ck, surface) {
@@ -608,7 +642,7 @@ async function runBoundsMode() {
     const renderer = new SkeletonRenderer(ck);
 
     const { sequence, totalFrames } = loadSequenceInfo(skeletonData);
-    const finalBounds = await computeFinalBounds(ck, skeletonData, sequence, totalFrames, renderer);
+    const finalBounds = applyRenderScale(await computeFinalBounds(ck, skeletonData, sequence, totalFrames, renderer));
 
     fs.writeFileSync(BOUNDS_FILE, JSON.stringify({ finalBounds, totalFrames, fps: FPS }, null, 2));
     console.log(`Bounds ditulis ke ${BOUNDS_FILE}`);
@@ -646,7 +680,7 @@ async function runFramesMode() {
     for (let i = FRAME_START; i < end; i++) {
         sim.advanceTo(i / FPS);
 
-        positionAndRender(ck, renderer, canvas, sim.drawable, finalBounds.originX, finalBounds.originY, bgColor);
+        positionAndRender(ck, renderer, canvas, sim.drawable, finalBounds.originX, finalBounds.originY, bgColor, finalBounds.renderScale || 1);
 
         const pngBytes = snapshotToPng(ck, surface);
         const framePath = path.join(FRAMES_OUT, `frame_${String(i).padStart(6, "0")}.png`);
@@ -675,7 +709,7 @@ async function runSingleMode() {
     const renderer = new SkeletonRenderer(ck);
     const { sequence, totalFrames } = loadSequenceInfo(skeletonData);
 
-    const finalBounds = await computeFinalBounds(ck, skeletonData, sequence, totalFrames, renderer);
+    const finalBounds = applyRenderScale(await computeFinalBounds(ck, skeletonData, sequence, totalFrames, renderer));
 
     console.log("[5/7] Creating final surface + FFmpeg...");
     console.log("  Frame transport: PNG image2pipe -> FFmpeg (no raw pixel readback)");
@@ -694,7 +728,7 @@ async function runSingleMode() {
         const t = i / FPS;
         sim3.advanceTo(t);
 
-        positionAndRender(ck, renderer, finalCanvas, sim3.drawable, finalBounds.originX, finalBounds.originY, resolveBgColor(ck));
+        positionAndRender(ck, renderer, finalCanvas, sim3.drawable, finalBounds.originX, finalBounds.originY, resolveBgColor(ck), finalBounds.renderScale || 1);
 
         const pngBytes = snapshotToPng(ck, finalSurface);
 

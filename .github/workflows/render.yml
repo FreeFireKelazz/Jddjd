@@ -67,6 +67,10 @@ on:
         description: "Nama bone yang translate-nya mau dikunci ke setup pose (rest position), pisahkan koma kalau lebih dari satu. Contoh: Root  atau  Root,BoneLain. Kosongkan kalau tidak perlu."
         required: false
         default: ""
+      render_max_dim:
+        description: "Opsional: render langsung di resolusi ini (sisi terpendek), skip PNG native lalu resize belakangan. Kosongkan buat render native seperti biasa (lebih fleksibel ganti max_dimension tanpa scan ulang)."
+        required: false
+        default: ""
 
 jobs:
   bounds:
@@ -108,6 +112,7 @@ jobs:
           FPS: ${{ github.event.inputs.fps }}
           BOUNDS: ${{ github.event.inputs.bounds_mode }}
           LOCK_BONE_TRANSLATE: ${{ github.event.inputs.lock_bone_translate }}
+          RENDER_MAX_DIM: ${{ github.event.inputs.render_max_dim }}
         run: node render_mp4.js
       - name: Generate thumbnail (frame pertama, crop presisi)
         working-directory: spine_renderer
