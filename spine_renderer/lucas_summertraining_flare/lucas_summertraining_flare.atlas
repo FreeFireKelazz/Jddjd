@@ -1,0 +1,27 @@
+lucas_summertraining_flare.png
+	size: 1091, 1005
+	filter: Linear, Linear
+	pma: true
+	scale: 0.4
+lensflare_03
+	bounds: 2, 2, 1001, 1087
+	rotate: 90
+
+lucas_summertraining_flare_2.png
+	size: 1148, 1054
+	filter: Linear, Linear
+	pma: true
+	scale: 0.4
+lensflare_01
+	bounds: 2, 2, 1050, 1144
+	offsets: 0, 0, 1053, 1144
+	rotate: 90
+
+lucas_summertraining_flare_3.png
+	size: 1127, 1234
+	filter: Linear, Linear
+	pma: true
+	scale: 0.4
+lensflare_02
+	bounds: 2, 2, 1123, 1230
+	offsets: 0, 0, 1132, 1230
