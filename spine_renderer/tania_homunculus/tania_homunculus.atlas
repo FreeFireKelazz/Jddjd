@@ -1,0 +1,299 @@
+tania_homunculus.png
+	size: 2033, 2033
+	filter: Linear, Linear
+	scale: 0.38
+Arm_Cloth_L_1
+	bounds: 1049, 76, 154, 105
+	rotate: 90
+Arm_Cloth_L_2
+	bounds: 540, 18, 153, 37
+Arm_Cloth_R_1
+	bounds: 1803, 1370, 128, 184
+	rotate: 90
+Arm_Cloth_R_2
+	bounds: 1247, 1148, 93, 131
+	offsets: 15, 0, 108, 131
+Arm_L
+	bounds: 902, 1280, 108, 438
+	offsets: 0, 0, 108, 443
+	rotate: 90
+Arm_R_1
+	bounds: 1497, 963, 234, 177
+Arm_R_2
+	bounds: 1954, 1513, 74, 276
+BG_1
+	bounds: 445, 564, 319, 343
+	offsets: 0, 17, 319, 360
+Bag
+	bounds: 444, 341, 139, 163
+	rotate: 90
+Bag_L_1
+	bounds: 1724, 744, 116, 200
+	rotate: 90
+Bag_L_2
+	bounds: 1758, 301, 35, 59
+	rotate: 90
+Bag_R_1
+	bounds: 1127, 599, 82, 85
+	rotate: 90
+Bag_R_2
+	bounds: 1425, 28, 52, 116
+	rotate: 90
+Ball
+	bounds: 1922, 349, 115, 66
+	offsets: 9, 0, 138, 82
+	rotate: 90
+Bed
+	bounds: 445, 908, 395, 322
+Body_Cloth_1
+	bounds: 902, 1534, 497, 498
+	offsets: 0, 0, 521, 498
+Body_Cloth_2
+	bounds: 1778, 1178, 207, 191
+Body_Cloth_3
+	bounds: 1047, 231, 173, 62
+	rotate: 90
+Cara_B
+	bounds: 1936, 465, 21, 30
+	rotate: 90
+Cara_L
+	bounds: 1155, 66, 165, 165
+Cara_R
+	bounds: 1935, 879, 177, 92
+	rotate: 90
+Doll_Ac_1
+	bounds: 876, 89, 172, 133
+Doll_Ac_2
+	bounds: 1497, 805, 226, 157
+Doll_Ac_3
+	bounds: 1922, 273, 94, 75
+Doll_Ac_4
+	bounds: 1642, 2, 108, 80
+	rotate: 90
+Doll_Ac_5
+	bounds: 1232, 8, 124, 57
+Doll_Body
+	bounds: 1, 2, 290, 330
+Doll_Tail
+	bounds: 1321, 69, 103, 168
+Eye_R
+	bounds: 1216, 1224, 55, 29
+	rotate: 90
+Eye_patch
+	bounds: 1778, 1057, 212, 120
+Eye_patch_Shadow
+	bounds: 1603, 583, 154, 100
+	rotate: 90
+Eyeball
+	bounds: 1772, 158, 27, 20
+	offsets: 0, 7, 27, 27
+Eyebrow_L
+	bounds: 1986, 1247, 46, 31
+Eyebrow_R
+	bounds: 1758, 289, 41, 11
+Eyelash_L_1
+	bounds: 1357, 34, 67, 34
+Eyelash_L_2
+	bounds: 856, 1280, 38, 9
+Eyelash_L_3
+	bounds: 841, 1214, 16, 14
+	offsets: 0, 1, 16, 15
+	rotate: 90
+Eyelight_1
+	bounds: 1341, 1382, 6, 6
+Eyelight_2
+	bounds: 1252, 405, 5, 4
+Finger_R
+	bounds: 1986, 1279, 46, 90
+Foot_L
+	bounds: 1859, 610, 133, 89
+	rotate: 90
+Hair_1
+	bounds: 725, 20, 69, 140
+	rotate: 90
+Hair_10
+	bounds: 1162, 926, 84, 266
+Hair_11
+	bounds: 445, 481, 82, 318
+	rotate: 90
+Hair_2
+	bounds: 856, 1290, 38, 86
+Hair_3
+	bounds: 1949, 636, 80, 125
+Hair_4
+	bounds: 1818, 351, 103, 113
+Hair_5
+	bounds: 1678, 158, 130, 93
+	rotate: 90
+Hair_6
+	bounds: 765, 550, 141, 357
+	offsets: 0, 2, 141, 359
+Hair_7
+	bounds: 866, 18, 70, 136
+	rotate: 90
+Hair_8
+	bounds: 1447, 586, 155, 150
+Hair_9
+	bounds: 1551, 111, 154, 126
+	rotate: 90
+Hair_Ac_L
+	bounds: 1503, 422, 91, 163
+Hair_Ac_R
+	bounds: 1423, 415, 79, 168
+Hair_B
+	bounds: 1247, 912, 228, 249
+	rotate: 90
+Hair_Bed
+	bounds: 907, 405, 170, 194
+	rotate: 90
+Hair_Bed_2
+	bounds: 1830, 465, 144, 105
+	offsets: 0, 0, 148, 111
+	rotate: 90
+Hair_L_1
+	bounds: 285, 521, 159, 657
+	offsets: 0, 0, 166, 657
+Hair_L_2
+	bounds: 434, 1231, 145, 421
+	offsets: 21, 0, 166, 421
+	rotate: 90
+Hair_L_3
+	bounds: 1, 333, 283, 845
+Hair_R_1
+	bounds: 1127, 682, 85, 243
+Hair_R_2
+	bounds: 902, 1389, 144, 454
+	rotate: 90
+Hair_R_3
+	bounds: 907, 576, 219, 352
+Hair_Ribbon_R_1
+	bounds: 1732, 1077, 35, 63
+Hair_Ribbon_R_2
+	bounds: 1482, 738, 66, 169
+	offsets: 3, 3, 69, 172
+	rotate: 90
+Hair_Ribbon_R_3
+	bounds: 1003, 33, 42, 151
+	rotate: 90
+Hand_L
+	bounds: 1936, 487, 122, 80
+	rotate: 90
+Head
+	bounds: 1732, 861, 195, 202
+	rotate: 90
+IV_Body_1
+	bounds: 1, 1179, 432, 853
+IV_Body_2
+	bounds: 1732, 1057, 19, 37
+	rotate: 90
+IV_Body_3
+	bounds: 2017, 1915, 13, 117
+IV_Body_4
+	bounds: 1709, 468, 120, 146
+IV_Drip
+	bounds: 1341, 1141, 240, 436
+	rotate: 90
+IV_Line_1
+	bounds: 1357, 1382, 116, 445
+	rotate: 90
+IV_Line_2
+	bounds: 856, 1193, 359, 86
+	offsets: 3, 0, 362, 86
+Leg_L_1
+	bounds: 1213, 584, 233, 152
+	offsets: 12, 0, 245, 158
+Leg_L_2
+	bounds: 1400, 1790, 242, 616
+	offsets: 13, 0, 255, 616
+	rotate: 90
+Leg_R_1
+	bounds: 292, 50, 247, 290
+Leg_R_2
+	bounds: 1400, 1499, 290, 553
+	offsets: 0, 0, 305, 553
+	rotate: 90
+Light_1
+	bounds: 1652, 749, 55, 70
+	rotate: 90
+Light_10
+	bounds: 764, 481, 120, 68
+Light_11
+	bounds: 1551, 1, 90, 109
+Light_12
+	bounds: 1723, 40, 117, 84
+	rotate: 90
+Light_13
+	bounds: 540, 56, 184, 284
+Light_14
+	bounds: 285, 341, 158, 179
+Light_15
+	bounds: 1772, 179, 105, 95
+Light_16
+	bounds: 876, 223, 170, 181
+Light_17
+	bounds: 1532, 266, 132, 155
+Light_18
+	bounds: 1213, 737, 234, 174
+Light_19
+	bounds: 1925, 762, 98, 107
+	rotate: 90
+Light_2
+	bounds: 1863, 19, 51, 52
+Light_20
+	bounds: 1425, 81, 125, 161
+Light_3
+	bounds: 1818, 275, 103, 75
+Light_4
+	bounds: 866, 431, 49, 40
+	rotate: 90
+Light_5
+	bounds: 1102, 405, 170, 149
+	rotate: 90
+Light_6
+	bounds: 1704, 615, 154, 128
+Light_7
+	bounds: 725, 90, 253, 150
+	rotate: 90
+Light_8
+	bounds: 1155, 1, 76, 64
+Light_9
+	bounds: 1808, 72, 106, 81
+	rotate: 90
+Light_B
+	bounds: 434, 1377, 467, 655
+	offsets: 19, 21, 491, 733
+Mouth
+	bounds: 1357, 1500, 36, 33
+Neck
+	bounds: 1274, 238, 147, 171
+Nose
+	bounds: 434, 1215, 10, 15
+Pants_L_1
+	bounds: 1110, 232, 163, 172
+Pants_L_2
+	bounds: 1422, 243, 109, 166
+	offsets: 0, 0, 165, 166
+Ribbon_L_1
+	bounds: 1808, 18, 53, 54
+	rotate: 90
+Ribbon_L_2
+	bounds: 292, 24, 25, 182
+	rotate: 90
+Ribbon_L_3
+	bounds: 1448, 749, 33, 162
+Shadow
+	bounds: 1252, 410, 170, 173
+Sheet
+	bounds: 608, 344, 136, 257
+	rotate: 90
+Shoe_L
+	bounds: 1665, 289, 92, 143
+Shoe_R
+	bounds: 1758, 337, 59, 130
+White
+	bounds: 841, 908, 49, 20
+Wing_L
+	bounds: 841, 929, 263, 320
+	rotate: 90
+Wing_R
+	bounds: 1595, 433, 113, 149
