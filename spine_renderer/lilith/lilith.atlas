@@ -1,0 +1,172 @@
+lilith.png
+	size: 2033, 2001
+	filter: Linear, Linear
+	scale: 0.6
+Arm_L_Cloth
+	bounds: 945, 1144, 155, 142
+	offsets: 0, 3, 155, 145
+Arm_R
+	bounds: 684, 15, 399, 641
+	rotate: 90
+Arm_R_Cloth
+	bounds: 1807, 440, 105, 127
+Ball
+	bounds: 1835, 1071, 196, 197
+	rotate: 90
+Body
+	bounds: 628, 415, 649, 540
+	offsets: 1, 0, 650, 540
+	rotate: 90
+Butterfly_1_1
+	bounds: 1867, 165, 46, 62
+Butterfly_1_2
+	bounds: 1933, 899, 23, 80
+	rotate: 90
+Butterfly_2_1
+	bounds: 1169, 452, 116, 126
+	offsets: 0, 13, 130, 139
+Butterfly_2_2
+	bounds: 1913, 440, 100, 127
+Butterfly_3_1
+	bounds: 1326, 1, 66, 69
+	offsets: 0, 4, 66, 73
+Butterfly_3_2
+	bounds: 1113, 1102, 49, 52
+Butterfly_4_1
+	bounds: 628, 292, 32, 50
+	rotate: 90
+Butterfly_4_2
+	bounds: 1169, 416, 35, 49
+	offsets: 0, 0, 55, 49
+	rotate: 90
+Cloth_1
+	bounds: 1543, 156, 269, 158
+	offsets: 0, 14, 269, 172
+Cloth_1_B_1
+	bounds: 1813, 156, 53, 71
+	offsets: 0, 12, 53, 83
+Cloth_1_B_2
+	bounds: 1101, 1155, 56, 53
+Cloth_2
+	bounds: 1, 292, 626, 772
+	offsets: 0, 12, 626, 784
+Cloth_2_B_1
+	bounds: 1386, 705, 506, 191
+Cloth_2_B_2
+	bounds: 1386, 568, 388, 136
+Cloth_2_B_3
+	bounds: 1451, 30, 40, 74
+	rotate: 90
+Cloth_2_B_4
+	bounds: 1101, 1209, 77, 62
+	rotate: 90
+Cloth_3
+	bounds: 1597, 315, 209, 252
+Cloth_4
+	bounds: 1169, 579, 216, 707
+	offsets: 7, 0, 223, 707
+Cloth_5
+	bounds: 945, 1287, 554, 713
+Eyeball_L
+	bounds: 1451, 8, 22, 21
+Eyeball_R
+	bounds: 2006, 293, 29, 26
+	rotate: 90
+Eyebrow_L
+	bounds: 1893, 706, 29, 33
+Eyebrow_R
+	bounds: 1286, 516, 62, 20
+	rotate: 90
+Eyelash_L_1
+	bounds: 1219, 416, 44, 35
+	offsets: 0, 0, 44, 43
+Eyelash_L_2
+	bounds: 2007, 412, 27, 25
+	offsets: 0, 0, 32, 26
+	rotate: 90
+Eyelash_L_3
+	bounds: 2016, 1039, 16, 13
+Eyelash_R_1
+	bounds: 1071, 1070, 73, 41
+	rotate: 90
+Eyelash_R_2
+	bounds: 1, 4, 42, 14
+	offsets: 0, 0, 43, 14
+Eyelash_R_3
+	bounds: 1526, 50, 16, 20
+Hair_1
+	bounds: 1775, 568, 136, 228
+	rotate: 90
+Hair_2
+	bounds: 1835, 899, 97, 171
+	offsets: 0, 0, 97, 172
+Hair_3
+	bounds: 1326, 320, 270, 247
+	offsets: 0, 33, 270, 280
+Hair_4
+	bounds: 1393, 8, 57, 62
+Hair_5
+	bounds: 1924, 713, 80, 101
+	offsets: 0, 1, 86, 115
+	rotate: 90
+Hair_6
+	bounds: 1543, 47, 108, 344
+	offsets: 8, 0, 116, 344
+	rotate: 90
+Hair_7
+	bounds: 628, 325, 44, 89
+Hair_B
+	bounds: 1, 1065, 943, 935
+	offsets: 0, 0, 991, 935
+Hand_shadow
+	bounds: 1933, 923, 147, 82
+	offsets: 0, 0, 174, 82
+	rotate: 90
+Head
+	bounds: 1326, 71, 216, 248
+	offsets: 16, 0, 232, 248
+Leg_L
+	bounds: 1500, 1268, 532, 732
+	offsets: 0, 4, 534, 736
+Leg_L_Ac_1_1
+	bounds: 1914, 146, 100, 84
+	offsets: 1, 0, 101, 84
+Leg_L_Ac_1_2
+	bounds: 1888, 69, 100, 76
+	offsets: 0, 11, 100, 87
+Leg_R_1
+	bounds: 1386, 897, 448, 370
+Leg_R_2
+	bounds: 1, 19, 272, 682
+	rotate: 90
+Leg_R_Ac_1_1
+	bounds: 1813, 228, 98, 101
+Leg_R_Ac_1_2
+	bounds: 1912, 231, 93, 91
+	offsets: 5, 13, 98, 104
+Leg_R_Ac_2_1
+	bounds: 1807, 330, 112, 109
+	offsets: 15, 206, 496, 315
+Leg_R_Ac_2_2
+	bounds: 1924, 794, 104, 83
+	offsets: 0, 0, 108, 83
+	rotate: 90
+Mouth
+	bounds: 2016, 1053, 17, 16
+	rotate: 90
+Nose
+	bounds: 1867, 156, 10, 8
+Ribbon_chest
+	bounds: 945, 1073, 125, 70
+Ribbon_hair_1
+	bounds: 1920, 323, 86, 116
+	offsets: 2, 0, 88, 116
+Ribbon_hair_2
+	bounds: 1893, 740, 30, 158
+	offsets: 28, 2, 58, 160
+White_L
+	bounds: 1989, 108, 37, 30
+	offsets: 0, 3, 37, 33
+	rotate: 90
+White_R
+	bounds: 1113, 1072, 49, 29
