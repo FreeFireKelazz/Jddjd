@@ -1,0 +1,140 @@
+yeonjoo.png
+	size: 2033, 1000
+	filter: Linear, Linear
+	scale: 0.4
+Eyeball_L
+	bounds: 1866, 25, 33, 32
+Eyeball_R
+	bounds: 1996, 125, 29, 30
+Head
+	bounds: 747, 222, 241, 292
+Shoe_L
+	bounds: 1029, 5, 54, 118
+	rotate: 90
+Shoe_R
+	bounds: 1252, 56, 101, 172
+White_L
+	bounds: 1739, 7, 65, 29
+White_R
+	bounds: 1300, 22, 53, 33
+arm_L_1
+	bounds: 1354, 7, 212, 127
+arm_L_2
+	bounds: 676, 1, 220, 175
+	rotate: 90
+arm_R_1
+	bounds: 405, 280, 214, 341
+	rotate: 90
+arm_R_2
+	bounds: 1017, 365, 316, 368
+	offsets: 0, 0, 316, 374
+	rotate: 90
+calf_L
+	bounds: 1405, 616, 128, 334
+	rotate: 90
+calf_R
+	bounds: 1405, 745, 254, 448
+	rotate: 90
+ears_L
+	bounds: 676, 229, 50, 69
+	rotate: 90
+ears_R
+	bounds: 355, 306, 46, 87
+elbow_L
+	bounds: 1740, 569, 175, 110
+	rotate: 90
+eye_shadow_L
+	bounds: 1203, 1, 96, 54
+	offsets: 32, 0, 128, 54
+eye_shadow_R
+	bounds: 1904, 70, 66, 53
+	offsets: 0, 0, 74, 58
+eyebrow_L
+	bounds: 1996, 224, 104, 36
+	rotate: 90
+eyebrow_R
+	bounds: 1348, 275, 89, 30
+	rotate: 90
+eyelash_L_1
+	bounds: 1657, 1, 81, 35
+eyelash_L_2
+	bounds: 676, 222, 47, 6
+	offsets: 0, 1, 48, 15
+eyelash_R_1
+	bounds: 1996, 156, 67, 36
+	offsets: 1, 0, 72, 36
+	rotate: 90
+eyelash_R_2
+	bounds: 1, 11, 39, 15
+	offsets: 0, 0, 48, 18
+eyelight_L
+	bounds: 2023, 989, 10, 9
+	rotate: 90
+eyelight_R
+	bounds: 1, 1, 8, 9
+hair_2
+	bounds: 1849, 329, 148, 189
+hair_3
+	bounds: 1029, 60, 168, 222
+	rotate: 90
+hair_4
+	bounds: 1764, 209, 84, 169
+hair_5
+	bounds: 1799, 58, 65, 104
+	rotate: 90
+hair_6_1
+	bounds: 1764, 138, 62, 70
+hair_6_2
+	bounds: 1567, 9, 89, 125
+hair_6_3
+	bounds: 1657, 37, 141, 94
+hair_b
+	bounds: 1017, 682, 387, 317
+hair_b_2
+	bounds: 1854, 731, 268, 168
+	offsets: 11, 0, 279, 168
+	rotate: 90
+hand_L
+	bounds: 1849, 124, 204, 146
+	rotate: 90
+hand_R
+	bounds: 355, 15, 320, 264
+knee_L
+	bounds: 1851, 519, 162, 211
+knee_R
+	bounds: 1386, 376, 239, 330
+	rotate: 90
+mouth
+	bounds: 1148, 1, 54, 58
+neck
+	bounds: 852, 7, 176, 214
+nose
+	bounds: 1799, 124, 13, 28
+	rotate: 90
+pants_L
+	bounds: 1, 27, 353, 366
+pants_R
+	bounds: 1386, 135, 240, 289
+	rotate: 90
+pants_back
+	bounds: 1676, 132, 243, 87
+	rotate: 90
+sweat_1
+	bounds: 2023, 980, 9, 8
+sweat_2
+	bounds: 1717, 607, 8, 22
+	rotate: 90
+sweat_3
+	bounds: 1827, 193, 21, 15
+thighs_L
+	bounds: 405, 495, 336, 504
+thighs_R
+	bounds: 742, 515, 274, 484
+torso
+	bounds: 1, 394, 403, 605
+torso_b_1
+	bounds: 1717, 379, 131, 189
+torso_b_2
+	bounds: 1805, 7, 60, 50
+torso_b_3
+	bounds: 989, 229, 358, 135
