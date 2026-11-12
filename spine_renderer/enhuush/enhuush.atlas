@@ -1,0 +1,107 @@
+enhuush.png
+	size: 2030, 1826
+	filter: Linear, Linear
+	scale: 0.7
+Arm_R_1
+	bounds: 1343, 1438, 686, 229
+Arm_R_2
+	bounds: 1231, 535, 503, 702
+	rotate: 90
+Eyeball_L
+	bounds: 269, 1785, 40, 41
+	rotate: 90
+Eyeball_R
+	bounds: 311, 1784, 50, 41
+Eyelash_L_1
+	bounds: 1065, 1767, 83, 58
+	offsets: 7, 0, 90, 95
+Eyelash_L_2
+	bounds: 126, 1808, 49, 17
+Eyelash_R_1
+	bounds: 843, 1771, 126, 54
+	offsets: 0, 2, 188, 72
+Eyelash_R_2
+	bounds: 28, 1812, 74, 13
+Hair_1
+	bounds: 1252, 1725, 205, 100
+	offsets: 0, 0, 211, 110
+Leg_R_1
+	bounds: 1, 161, 466, 1048
+	rotate: 90
+White_L
+	bounds: 773, 1774, 69, 51
+White_R
+	bounds: 659, 1775, 113, 50
+arm_L_1
+	bounds: 1, 727, 737, 426
+	offsets: 0, 0, 862, 473
+arm_L_2
+	bounds: 1, 1280, 408, 307
+body_b
+	bounds: 410, 1154, 343, 423
+	offsets: 474, 812, 1049, 1486
+	rotate: 90
+body_b_2
+	bounds: 1, 1588, 634, 188
+ear
+	bounds: 1458, 1721, 110, 104
+eyebrow_L
+	bounds: 970, 1768, 94, 57
+eyebrow_R
+	bounds: 362, 1782, 138, 43
+eyelight_L
+	bounds: 1, 1814, 12, 11
+eyelight_R
+	bounds: 14, 1814, 13, 11
+face
+	bounds: 834, 1081, 370, 466
+	offsets: 65, 0, 435, 501
+	rotate: 90
+hair00
+	bounds: 739, 628, 452, 491
+	rotate: 90
+hand_L
+	bounds: 636, 1498, 368, 269
+mouth
+	bounds: 1149, 1738, 102, 87
+neck
+	bounds: 1005, 1452, 272, 337
+	rotate: 90
+nose
+	bounds: 234, 1796, 34, 29
+pants_01
+	bounds: 1050, 1, 767, 533
+pants_02
+	bounds: 1301, 1039, 427, 398
+	offsets: 0, 0, 427, 452
+pants_02_b
+	bounds: 1569, 1668, 396, 157
+sweat_1
+	bounds: 176, 1806, 19, 26
+	rotate: 90
+sweat_2
+	bounds: 203, 1800, 25, 30
+	offsets: 0, 0, 66, 30
+	rotate: 90
+sweat_3
+	bounds: 103, 1810, 22, 15
+레이어 7
+	bounds: 501, 1777, 157, 48
+
+enhuush_2.png
+	size: 1935, 1698
+	filter: Linear, Linear
+	scale: 0.7
+Leg_L_1
+	bounds: 1, 1, 625, 1030
+	rotate: 90
+Leg_L_2
+	bounds: 1396, 900, 538, 797
+body
+	bounds: 1, 627, 670, 1070
+	offsets: 192, 165, 1049, 1486
+leg_R_2
+	bounds: 672, 861, 836, 723
+	rotate: 90
+ponytail
+	bounds: 1032, 71, 691, 789
