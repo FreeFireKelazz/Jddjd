@@ -1,0 +1,92 @@
+yedam.png
+	size: 2030, 1857
+	filter: Linear, Linear
+	scale: 0.45
+Arm_L
+	bounds: 1244, 918, 586, 938
+Arm_R
+	bounds: 1831, 1115, 176, 741
+Body_1
+	bounds: 1244, 443, 474, 719
+	rotate: 90
+Body_2
+	bounds: 596, 166, 471, 257
+Cloth_B
+	bounds: 338, 1, 44, 52
+	rotate: 90
+Eyeball_L
+	bounds: 1372, 1, 39, 33
+Eyeball_R
+	bounds: 1904, 230, 42, 38
+Eyebrow_L
+	bounds: 437, 103, 48, 25
+Eyebrow_R
+	bounds: 338, 96, 98, 32
+Eyelash_L_1
+	bounds: 1904, 269, 54, 42
+	rotate: 90
+Eyelash_L_2
+	bounds: 1039, 86, 40, 26
+	rotate: 90
+Eyelash_L_3
+	bounds: 1831, 918, 15, 28
+	rotate: 90
+Eyelash_R_1
+	bounds: 971, 127, 94, 38
+Eyelash_R_2
+	bounds: 596, 441, 58, 20
+Eyelash_R_3
+	bounds: 1244, 424, 34, 18
+	offsets: 0, 0, 34, 37
+Eyelight_L
+	bounds: 1949, 433, 9, 9
+Eyelight_R
+	bounds: 2008, 1847, 10, 9
+Finger_R_1
+	bounds: 1372, 35, 41, 140
+	rotate: 90
+Finger_R_2
+	bounds: 1904, 324, 44, 118
+Finger_R_3
+	bounds: 338, 46, 71, 49
+Finger_R_4
+	bounds: 971, 66, 67, 60
+Hair_1
+	bounds: 786, 8, 157, 184
+	rotate: 90
+Hair_2
+	bounds: 1706, 215, 197, 227
+Hair_3
+	bounds: 1068, 29, 303, 394
+Hair_4
+	bounds: 1831, 934, 180, 198
+	rotate: 90
+Hair_5
+	bounds: 1, 129, 332, 594
+	rotate: 90
+Hair_6
+	bounds: 1, 26, 102, 238
+	rotate: 90
+Hair_B
+	bounds: 240, 31, 97, 97
+Hand_R
+	bounds: 1706, 40, 234, 174
+Head
+	bounds: 1372, 77, 333, 365
+Leg_L
+	bounds: 1, 462, 653, 1394
+Leg_R
+	bounds: 655, 424, 588, 1432
+Mouth
+	bounds: 971, 17, 48, 66
+	rotate: 90
+Neck
+	bounds: 596, 35, 130, 189
+	rotate: 90
+Nose
+	bounds: 1412, 7, 27, 39
+	rotate: 90
+White_L
+	bounds: 1586, 40, 42, 36
+White_R
+	bounds: 1513, 41, 72, 35
