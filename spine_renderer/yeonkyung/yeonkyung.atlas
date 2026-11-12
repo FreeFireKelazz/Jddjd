@@ -1,0 +1,118 @@
+yeonkyung.png
+	size: 2043, 2013
+	filter: Linear, Linear
+Arm_L_2
+	bounds: 1482, 656, 433, 414
+Arm_R_1
+	bounds: 1, 1031, 363, 486
+	rotate: 90
+Arm_R_2
+	bounds: 546, 1643, 761, 251
+Body_1_b
+	bounds: 1, 200, 640, 398
+Body_2
+	bounds: 1473, 1, 654, 540
+	rotate: 90
+Body_Ac
+	bounds: 1052, 1896, 209, 116
+Eyeball_L
+	bounds: 165, 1994, 18, 20
+	rotate: 90
+Eyeball_R
+	bounds: 434, 1988, 35, 24
+Eyebrow_L
+	bounds: 42, 1999, 23, 13
+Eyebrow_R
+	bounds: 470, 1988, 114, 24
+Eyelash_L_1
+	bounds: 657, 1986, 31, 26
+Eyelash_L_2
+	bounds: 66, 1999, 26, 13
+Eyelash_R_1
+	bounds: 689, 1977, 88, 35
+	offsets: 0, 0, 88, 40
+Eyelash_R_2
+	bounds: 186, 1992, 81, 20
+	offsets: 0, 0, 81, 42
+Eyelid_L
+	bounds: 1, 2005, 15, 7
+Eyelid_R
+	bounds: 375, 1989, 58, 23
+Eyelight_L
+	bounds: 17, 2004, 8, 10
+	rotate: 90
+Eyelight_R
+	bounds: 28, 2001, 13, 11
+Foot_L
+	bounds: 1, 1395, 340, 539
+	rotate: 90
+Foot_R
+	bounds: 488, 966, 364, 488
+	rotate: 90
+Hair_1
+	bounds: 1816, 1813, 226, 199
+Hair_2
+	bounds: 1262, 1895, 149, 117
+Hair_3
+	bounds: 847, 1904, 108, 204
+	rotate: 90
+Hair_4
+	bounds: 1308, 1618, 269, 322
+	rotate: 90
+Hand_L
+	bounds: 276, 1736, 269, 251
+Hand_R
+	bounds: 1, 1808, 182, 274
+	rotate: 90
+Head
+	bounds: 977, 905, 371, 504
+	rotate: 90
+Leg_L_2
+	bounds: 921, 376, 528, 551
+	rotate: 90
+Leg_R_1
+	bounds: 1, 599, 366, 919
+	rotate: 90
+Leg_R_2
+	bounds: 541, 1331, 648, 311
+Mouth
+	bounds: 296, 1990, 78, 22
+Nose
+	bounds: 778, 1949, 63, 68
+	rotate: 90
+Pants_L_1
+	bounds: 1631, 1502, 403, 310
+Pants_L_2
+	bounds: 1412, 1888, 403, 124
+Pants_R_1
+	bounds: 1620, 1071, 430, 354
+	rotate: 90
+Pants_R_2
+	bounds: 1190, 1277, 429, 340
+White_L
+	bounds: 268, 1991, 27, 21
+White_R
+	bounds: 585, 1988, 71, 24
+sweat_1
+	bounds: 93, 1999, 13, 32
+	rotate: 90
+sweat_2
+	bounds: 145, 1996, 16, 19
+	rotate: 90
+sweat_3
+	bounds: 126, 1999, 13, 18
+	rotate: 90
+
+yeonkyung_2.png
+	size: 1338, 1210
+	filter: Linear, Linear
+Arm_L_1
+	bounds: 843, 68, 681, 494
+	rotate: 90
+Body_1
+	bounds: 1, 1, 748, 841
+	rotate: 90
+Leg_L_1
+	bounds: 1, 750, 459, 1097
+	offsets: 0, 0, 459, 1152
+	rotate: 90
