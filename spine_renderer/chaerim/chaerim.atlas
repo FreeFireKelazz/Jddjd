@@ -1,0 +1,92 @@
+chaerim.png
+	size: 1968, 1953
+	filter: Linear, Linear
+	scale: 0.35
+Arm_L
+	bounds: 1475, 1138, 814, 487
+	rotate: 90
+Arm_R
+	bounds: 1, 222, 730, 717
+	rotate: 90
+Body_1
+	bounds: 719, 378, 574, 755
+	rotate: 90
+Body_2
+	bounds: 965, 985, 509, 356
+Eyeball_L
+	bounds: 701, 55, 41, 35
+Eyeball_R
+	bounds: 899, 35, 23, 39
+Eyebrow_L
+	bounds: 384, 9, 108, 41
+Eyebrow_R
+	bounds: 761, 12, 44, 43
+	rotate: 90
+Eyelash_L_1
+	bounds: 493, 6, 100, 44
+Eyelash_L_2
+	bounds: 791, 69, 46, 21
+	offsets: 0, 0, 54, 21
+Eyelash_L_3
+	bounds: 743, 67, 47, 23
+	offsets: 0, 0, 49, 23
+Eyelash_R_1
+	bounds: 672, 1, 48, 50
+Eyelash_R_2
+	bounds: 838, 74, 23, 16
+Eyelash_R_3
+	bounds: 862, 77, 13, 28
+	rotate: 90
+Eyelight_L
+	bounds: 766, 57, 12, 9
+Eyelight_R
+	bounds: 779, 58, 8, 8
+Hair_B
+	bounds: 719, 266, 111, 90
+	rotate: 90
+Head
+	bounds: 1576, 84, 365, 391
+	offsets: 0, 2, 365, 393
+	rotate: 90
+Leg_L_1
+	bounds: 1475, 450, 450, 687
+Leg_L_2
+	bounds: 965, 1342, 452, 610
+Leg_R
+	bounds: 1, 953, 999, 963
+	rotate: 90
+Mouth
+	bounds: 899, 1, 33, 23
+	rotate: 90
+Neck
+	bounds: 502, 52, 169, 198
+	rotate: 90
+Pony_1
+	bounds: 951, 56, 321, 624
+	rotate: 90
+Pony_2
+	bounds: 1, 8, 213, 269
+	rotate: 90
+Pony_3
+	bounds: 271, 51, 230, 170
+Pony_4
+	bounds: 701, 91, 130, 249
+	rotate: 90
+White_L
+	bounds: 594, 2, 77, 49
+White_R
+	bounds: 721, 4, 39, 50
+dot
+	bounds: 1, 2, 5, 4
+	rotate: 90
+hair_1
+	bounds: 271, 6, 44, 112
+	rotate: 90
+hair_2
+	bounds: 805, 1, 93, 67
+sweat_1
+	bounds: 743, 57, 9, 22
+	rotate: 90
+sweat_2
+	bounds: 891, 75, 15, 12
+	rotate: 90
